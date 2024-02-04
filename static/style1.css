@@ -1,0 +1,52 @@
+
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f0f0; /* Gris claro de fondo */
+    color: #333333; /* Color del texto principal */
+}
+
+.container {
+    max-width: 800px;
+}
+
+.jumbotron {
+    background-color: #333333; /* Gris oscuro para el jumbotron */
+    color: #ffffff; /* Texto blanco en el jumbotron */
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.card {
+    transition: transform 0.3s ease;
+    background-color: #ffffff; /* Fondo blanco para las tarjetas */
+    color: #333333; /* Texto oscuro en las tarjetas */
+    border: 1px solid #dddddd; /* Borde suave para agregar contraste */
+    border-radius: 10px;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    color: #333333; /* Color del título más oscuro */
+}
+
+.card-text {
+    color: #555555; /* Texto más oscuro que el color principal */
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-top: 20px;
+}
+
+.float-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
