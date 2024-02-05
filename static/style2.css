@@ -1,0 +1,185 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #e74c3c;
+  --bg-color: #f8f9fa;
+  --text-color: #333;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: url('backgroundcliente.jpg') center/cover no-repeat;
+  color: var(--text-color);
+  margin: 0;
+  transition: background-color 0.3s ease;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  background-color: #4e54c8;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer {
+  background-color: #8f94fb;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  transition: bottom 0.3s ease;
+}
+
+.footer.show {
+  bottom: 0;
+}
+
+.profile-container {
+  background-color: #fff;
+  padding: 30px; /* ajustar según sea necesario */
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px; /* valor para dar más espacio entre la ventana y el footer */
+}
+
+
+img.profile-image,
+img.current-photo {
+  max-width: 50%; /* Reducido aún más el tamaño de la imagen */
+  height: auto;
+  border-radius: 50%;
+  border: 5px solid var(--primary-color);
+  display: block;
+  margin: 0 auto 20px; /* Añadido margen inferior para separar la imagen del contenido */
+}
+
+button.btn-link {
+  padding: 8px 16px;
+  color: #fff;
+  font-size: 16px;
+  margin-right: 300px; /* Ajuste para acercar el botón a la izquierda */
+  background-color: var(--primary-color); /* Resalta el botón de regresar */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button.btn-link:hover {
+  background-color: #2980b9; /* Cambia el color al pasar el ratón */
+  text-decoration: none;
+}
+
+.modal {
+  z-index: 1;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.modal-header h5 {
+  margin: 0;
+}
+
+.modal-body {
+  padding-bottom: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+  color: var(--primary-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Nuevos estilos integrados */
+
+.btn-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
