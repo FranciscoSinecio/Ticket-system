@@ -35,7 +35,7 @@ def login():
 
     #comoprobamos el usuario
 
-    if user:
+    if user == :
         return
 
 # Ruta para la página principal después de iniciar sesión (ejemplo)
