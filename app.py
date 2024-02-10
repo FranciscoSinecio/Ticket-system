@@ -65,7 +65,7 @@ def login():
             session['id'] = account[0]
         return redirect(url_for('panelCliente'))
     else:
-            return render_template('login.html')
+            return 'Hola'
     
 #----------------------------------------------------------------------------------------------------
 
