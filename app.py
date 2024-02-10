@@ -28,7 +28,7 @@ def configure_row_factory():
 #----------------------------------------------------------------------------------------------------
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return render_template('login.html')
 
 #----------------------------------------------------------------------------------------------------
 @app.route('/panelCliente')
