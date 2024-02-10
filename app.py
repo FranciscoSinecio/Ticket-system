@@ -23,6 +23,10 @@ def dict_factory(cursor,row):
 @app.before_request
 def configure_row_factory():
     mysql.connection.cursor().row_factory = dict_factory
+
+
+
+
 #----------------------------------------------------------------------------------------------------   
 # ->Vistas
 #----------------------------------------------------------------------------------------------------
