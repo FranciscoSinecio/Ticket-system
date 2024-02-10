@@ -24,9 +24,6 @@ def dict_factory(cursor,row):
 def configure_row_factory():
     mysql.connection.cursor().row_factory = dict_factory
 
-
-
-
 #----------------------------------------------------------------------------------------------------   
 # ->Vistas
 #----------------------------------------------------------------------------------------------------
@@ -53,23 +50,29 @@ def panelCliente():
 #-> Logica de acceso
 
 #----------------------------------------------------------------------------------------------------
-@app.route('/acces-login',methods=["GET","POST"])
+# Lógica de acceso
+@app.route('/acces-login', methods=["POST"])
 def login():
-    if request.method == 'POST'and 'txtcorreo'in request.form and 'txtpassword':
+    if request.method == 'POST' and 'txtcorreo' in request.form and 'txtpassword' in request.form:
         _correo = request.form['txtcorreo']
         _password = request.form['txtpassword']
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM cliente WHERE correo_electronico =%s AND contrasena = %s', (_correo,_password,))
+        cur.execute('SELECT * FROM cliente WHERE correo_electronico = %s', (_correo,))
         account = cur.fetchone()
         cur.close()
-        print (account)  # debe de borrarse una vez que haya conectado 
 
-        if account:
+        if account and account['contrasena'] == _password:
             session['logueado'] = True
-            session['id'] = account[0]
-        return redirect(url_for('panelCliente'))
+            session['id'] = account['idCliente']
+            print('Datos obtenidos en la session son :', session)
+            #return redirect(url_for('panelCliente'))  # Redirigir al panel del cliente si la autenticación es exitosa
+            return render_template('panelcliente.html')
+        else:
+            error = 'Credenciales incorrectas. Por favor, inténtelo de nuevo.'
+            return render_template('login.html', error=error)  # Mostrar mensaje de error en el formulario de inicio de sesión
     else:
-            return 'Hola'
+        return redirect(url_for('index'))  # Redirigir al inicio si no se envió una solicitud POST o faltan campos en el formulario
+
     
 #----------------------------------------------------------------------------------------------------
 
