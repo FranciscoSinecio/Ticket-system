@@ -31,51 +31,76 @@ def configure_row_factory():
 def index():
     return render_template('login.html')
 
-#----------------------------------------------------------------------------------------------------
-@app.route('/panelCliente')
-def panelCliente():
-    if 'logueado' in session and session['logueado']:
-        #conecto a la base de datos para la consulta para la obtencion de la informacion del cliente 
-        cur = mysql.connect.cursor()
-        cur.execute('SELECT * FROM cliente WHERE nombre =%s',(session['id'],))
-        user_info = cur.fetchone()
-        cur.close()
+@app.route('/panel_cliente')
+def panel_cliente():
+    id_cliente = session.get('id', None)
+    nombre = session.get('nombre_sh', None)
+    ap_paterno = session.get('ap_pat', None)
+    ap_materno = session.get('ap_mat', None)
+    email = session.get('email', None)
+    return render_template('panel_cliente.html', id_cliente=id_cliente, nombre=nombre, ap_paterno= ap_paterno, ap_materno = ap_materno)
 
-        return render_template('panelcliente.html', user_info=user_info)
-    else:
-        return redirect(url_for('login'))
+@app.route('/admin_cliente')
+def admin_cliente():
+    id_personal = session.get('id', None)
+    nombre = session.get('nombre_sh', None)
+    ap_paterno = session.get('ap_pat', None)
+    ap_materno = session.get('ap_mat', None)
+    email = session.get('email', None)
+    telefono = session.get('telefono', None)
+    departamento = session.get('depto', None)
 
-#----------------------------------------------------------------------------------------------------
+    datos = {
+        'id' : id_personal,
+        'nombre' : nombre,
+        'ap_paterno' : ap_paterno,
+        'ap_materno' : ap_materno,
+        'email': email,
+        'telefono' : telefono,
+        'dpto' : departamento
+    }
 
-#-> Logica de acceso
+    return render_template(('admincliente.html'),datos = datos)
 
-#----------------------------------------------------------------------------------------------------
-# Lógica de acceso
-@app.route('/acces-login', methods=["POST"])
+@app.route('/edit_profile')
+
+
+
+@app.route('/pruebas')
+def pruebas():
+    print(url_for('pruebas'))
+    return render_template('pruebas.html')
+
+
+@app.route('/login',methods=["GET","POST"])
 def login():
-    if request.method == 'POST' and 'txtcorreo' in request.form and 'txtpassword' in request.form:
-        _correo = request.form['txtcorreo']
-        _password = request.form['txtpassword']
+    if request.method == 'POST' and 'username' in request.form and 'password':
+        usuario = request.form['username']
+        clave = request.form['password']
+        #activo cursor
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM cliente WHERE correo_electronico = %s', (_correo,))
+        cur.execute('SELECT * FROM cliente WHERE correo_electronico = %s AND contrasena = %s', (usuario,clave,))
         account = cur.fetchone()
-        cur.close()
+        print (account)
+        
+        
 
-        if account and account['contrasena'] == _password:
-            session['logueado'] = True
-            session['id'] = account['idCliente']
-            print('Datos obtenidos en la session son :', session)
-            #return redirect(url_for('panelCliente'))  # Redirigir al panel del cliente si la autenticación es exitosa
-            return render_template('panelcliente.html')
+        if account:
+            session['logueado']=True
+            session['id']=account[0]
+            session['nombre_sh']=account[1]
+            session['ap_pat'] = account[2]
+            session['ap_mat'] = account[3]
+            session['email'] = account[4]
+            session['telefono'] = account[7]
+            session['depto'] = account[8]
+
+            print('valores de SESSION: ', session)
+            return redirect(url_for('panel_cliente'))
         else:
-            error = 'Credenciales incorrectas. Por favor, inténtelo de nuevo.'
-            return render_template('login.html', error=error)  # Mostrar mensaje de error en el formulario de inicio de sesión
-    else:
-        return redirect(url_for('index'))  # Redirigir al inicio si no se envió una solicitud POST o faltan campos en el formulario
+            return redirect(url_for('login'))
 
-    
-#----------------------------------------------------------------------------------------------------
 
-#----------------------------------------------------------------------------------------------------
+
 if __name__ =='__main__':
     app.run(debug = True, )

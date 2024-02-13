@@ -1,0 +1,80 @@
+{%extends 'base.html'%}
+
+    {% block estilos %}
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
+
+    {% endblock %}
+
+    {% block titulo %} 
+        panel_cliente
+    {%endblock%}
+
+        {% block content%}
+        <h1 style="font-size: 30px;
+                    font-family: sans-serif;">
+        ¡ Buen día ! 
+        </h1>
+        <div class="gradient-background"></div>
+
+        <div class="container mt-5">
+            <div class="float-right">
+            </div>
+
+            <div class="jumbotron text-center mb-5">
+                <h2 class="display-4">¡Bienvenido, {{nombre}}!</h2>
+                <h2 style="font-size: 50px;">{{ap_paterno}} {{ap_materno}}</h2>
+                <h2 class="lead">ID :{{id_cliente}}</h2>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Administrar Perfil</h5>
+                            <p class="card-text">Personaliza y gestiona tu perfil.</p>
+                            <a href="{{ url_for('admin_cliente')}}" class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Solicitar Ticket</h5>
+                            <p class="card-text">Envía una solicitud para obtener asistencia.</p>
+                            <a href="" class="btn btn-primary"><i class="fas fa-ticket-alt"></i> Ir</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">Mis Tickets</h5>
+                            <p class="card-text">Consulta el estado de tus tickets.</p>
+                            <a href="" class="btn btn-primary"><i class="fas fa-history"></i> Ir</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="organization-container float-right">
+            <!-- Agrega aquí el icono de la organización -->
+            <img src="{{ url_for('static', filename='profile.png') }}" alt="Icono de la organización" class="profile-image">
+        </div>
+
+        <div class="footer">
+            <p>Todos los derechos reservados &copy; 2024</p>
+        </div>
+    
+            
+        {% endblock %}
+        
+        {% block scripts %}
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        {% endblock %}
