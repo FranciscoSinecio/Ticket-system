@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style3.css') }}">
+    <!-- Agrega el enlace a Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Agrega el enlace a la biblioteca Draggable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/draggable/1.0.1-beta.10/draggable.bundle.legacy.min.js"></script>
+    <!-- Agrega el enlace al conjunto de iconos FontAwesome -->
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+    <title>Solicitar Ticket</title>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-link" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> Regresar
+                    </button>
+                </div>
+                <div class="col text-center">
+                    <h1>Solicitar Ticket</h1>
+                </div>
+                <div class="col">
+                    <!-- Puedes agregar más elementos al encabezado si es necesario -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="profile-container text-center">
+                    <form action="{{ url_for('submit_support_ticket') }}" method="POST">
+                        <div class="form-group">
+                            <label for="department">Departamento:</label>
+                            <select class="form-control" id="department" name="department" required>
+                                <option value="" selected disabled>Seleccionar Incidente</option>
+                                <option value="fallas de office">Fallas de Office</option>
+                                <option value="fallas de red">Fallas de Red</option>
+                                <option value="errores software">Errores de Software</option>
+                                <option value="errores hardware">Errores de Hardware</option>
+                                <option value="mantenimiento preventivo">Mantenimiento Preventivo</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Descripción:</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Entregar</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelRequest()"><i class="fas fa-times"></i> Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>Todos los derechos reservados &copy; 2024</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Agrega los enlaces a las bibliotecas de Bootstrap y jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Tu script personalizado -->
+    <script src="{{ url_for('static', filename='solicitud_ticket.js') }}"></script>
+
+</body>
+
+</html>
