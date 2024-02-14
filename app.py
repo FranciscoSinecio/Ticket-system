@@ -62,7 +62,54 @@ def admin_cliente():
 
     return render_template(('admincliente.html'),datos = datos)
 
-@app.route('/edit_profile')
+@app.route('/edit_profile', methods=('GET','POST'))
+def edit_profile():
+    if request.method == 'POST':
+        id_personal =  session.get['id', None]
+        nombre = request.form['name']
+        email = request.form['email']
+        telefono = request.form['phone']
+        departamento = request.form['department']
+
+        #Activamos el cursor para realizar los cambios en base de datos
+
+        cur = mysql.connection.cursor()
+
+        #Actualizo los datos de la base de datos
+
+        cur.execute('UPDATE cliente SET nombre = %s, correo_electronico = %s, telefono = %s, departamento = %s WHERE idCliente=%s',
+                    (nombre,email,telefono,departamento,id_personal))
+        mysql.connection.commit()
+        cur.close()
+
+        #ACTUALIZAMOS LOS DATOS DE LA SESION DE USUARIO
+
+        session['nombre_sh'] = nombre
+        session['email'] = email
+        session['telefono'] = telefono
+        session['depto'] = departamento
+
+        return redirect(url_for('panel_cliente'))
+    
+    else:
+
+        id_personal = session.get('id', None)
+        nombre = session.get('nombre_sh',None)
+        email = session.get('email', None)
+        telefono = session.get('telefono', None)
+        departamento = session.get('depto', None)
+
+        datos= {
+
+            'id': id_personal,
+            'nombre': nombre,
+            'email': email,
+            'telefono': telefono,
+            'depto' : departamento
+        }
+
+        return redirect(url_for('panel_cliente'))
+        
 
 
 
