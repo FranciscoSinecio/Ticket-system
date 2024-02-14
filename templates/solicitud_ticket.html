@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -40,10 +40,10 @@
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <div class="profile-container text-center">
-                    <form action="{{ url_for('submit_support_ticket') }}" method="POST">
+                    <form action="{{ url_for('solicitar_ticket') }}" method="POST">
                         <div class="form-group">
-                            <label for="department">Departamento:</label>
-                            <select class="form-control" id="department" name="department" required>
+                            <label for="department">Problemas comunes:</label>
+                            <select class="form-control" id="common_problems" name="common_problems" required>
                                 <option value="" selected disabled>Seleccionar Incidente</option>
                                 <option value="fallas de office">Fallas de Office</option>
                                 <option value="fallas de red">Fallas de Red</option>
