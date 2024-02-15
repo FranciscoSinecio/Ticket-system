@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 from datetime import datetime
 
@@ -140,8 +140,8 @@ def login():
             session['ap_pat'] = account[2]
             session['ap_mat'] = account[3]
             session['email'] = account[4]
-            session['telefono'] = account[7]
-            session['depto'] = account[8]
+            session['telefono'] = account[6]
+            session['depto'] = account[7]
 
             print('valores de SESSION: ', session)
             return redirect(url_for('panel_cliente'))
@@ -150,37 +150,27 @@ def login():
 #-------------------------------------------------------------------------------
 # -> Creación de la vista y la ruta para solicitudes de tickets
 
-
-@app.route('/solicitar_ticket',methods = ['POST'])
+@app.route('/solicitar_ticket', methods = ['GET','POST'])
 def solicitar_ticket():
     if request.method == 'POST':
-        incidente = request.form['common_problems']
+        problemas = request.form['common_problems']
         descripcion = request.form['description']
-        fecha_exp = datetime.now().strftime('%Y-%m-%d')
-#proces de registo en base de datos
-        #activamos el cursor
-        cur = mysql.conecction.cursor()
+        time = datetime.now().strftime('%Y-%m-%d')
+        #obtengo el id de mi cliente
+        id_cliente = session.get('id', None)
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO tickets (Problema, Descripcion_problema, fecha_expedicion, idCliente) VALUES (%s, %s, %s, %s)",
+            (problemas, descripcion, time, id_cliente))
+            mysql.connection.commit()
+            cur.close()
+            flash('Los registros se han cargado satisfactoriamente', 'success')
+            return redirect(url_for('panel_cliente'))
+        
+        except Exception as e:
+            error_message = "Error al registrar el incidente" + str(e)
+            flash('No se cargaron los registros ' + error_message, 'error')
 
-        #insertamos el ticket en la tabla tickets
-        cur.execute('INSERT INTO tickets (Problema,Descripcion_problema,fecha_expedicion) VALUES (%s, %s, %s)',
-                    (incidente, descripcion, fecha_exp))
-        mysql.connection.commit() #ejecutamos la acción descrita 
-
-        #obtnemos el id del estado solicitado
-
-        cur.execute("SELECT id_status FROM status WHERE nombre_estado = 'Solicitado'")
-        id_status_solicitado = cur.fetchone()
-        if not id_status_solicitado:
-            cur.execute("INSERT INTO status (nombre_estado) VALUES ('solicitado')")
-            mysql.connection.comit()
-            cur.execute("SELECT_LAST INSERT_ID () AS id_status")
-            id_status_solicitado = cur.fetchone()
-        else:
-            id_status_solicitado = id_status_solicitado['id_status']
-
-            #Actulalización de la tabla tickets
-
-        #->cur.execute
 
     return render_template('solicitud_ticket.html')
 
