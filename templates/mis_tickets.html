@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tickets</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="static/style4.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-link" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Regresar
+          </button>
+        </div>
+        <div class="col text-center">
+          <h1>Mis Tickets</h1>
+        </div>
+        <div class="col">
+          <!-- elementos al encabezado  -->
+        </div>
+      </div>
+  </header>
+  
+   <!-- nav -->
+  <nav class="navbar navbar-custom">
+    <div>
+    </div>
+    <div class="nav-btns">
+      <a class="btn btn-primary" href="#"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a class="btn btn-success" href="#"><i class="fas fa-ticket-alt"></i> Solicitar Ticket</a>
+      <a class="btn btn-info" href="#"><i class="fas fa-list-alt"></i> Mis Tickets</a>
+    </div>
+  </nav>
+  
+
+  <!-- Contenido principal -->
+  <div class="container mt-4">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>No ticket</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Departamento</th>
+          <th>Status</th>
+          <th>Cancelar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- tabla con datos dinámicos usando JavaScript -->
+        <!-- estático -->
+        <tr>
+          <td>001</td>
+          <td>13/02/2024</td>
+          <td>Problema con el correo electrónico</td>
+          <td>Soporte Técnico</td>
+          <td>Abierto</td>
+          <td><button class="btn btn-danger" onclick="confirmarCancelar(1)">Cancelar</button></td>
+        </tr>
+        <tr>
+          <td>002</td>
+          <td>14/02/2024</td>
+          <td>Problema de acceso al sistema</td>
+          <td>Departamento de TI</td>
+          <td>Cerrado</td>
+          <td><button class="btn btn-danger" onclick="confirmarCancelar(2)">Cancelar</button></td>
+        </tr>
+        <!-- filas según sea necesario -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p>&copy; 2024 - Todos los derechos reservados</p>
+        </div>
+      </div>
+  </footer>
+
+  <!-- Bootstrap JS (jQuery debe incluirse antes) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Script personalizado -->
+  <script>
+    function confirmarCancelar(ticketId) {
+      if (confirm('¿Seguro desea cancelar el ticket?')) {
+        // implementar la lógica para cancelar el ticket
+        // se podra enviar una solicitud AJAX al servidor para eliminar el ticket de la base de datos
+        // mensaje de confirmación
+        alert('Ticket cancelado exitosamente');
+        // mensaje de alerta indicando que el ticket fue cancelado
+      }
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>
