@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
@@ -62,7 +63,54 @@ def admin_cliente():
 
     return render_template(('admincliente.html'),datos = datos)
 
-@app.route('/edit_profile')
+@app.route('/edit_profile', methods=('GET','POST'))
+def edit_profile():
+    if request.method == 'POST':
+        id_personal =  session.get['id', None]
+        nombre = request.form['name']
+        email = request.form['email']
+        telefono = request.form['phone']
+        departamento = request.form['department']
+
+        #Activamos el cursor para realizar los cambios en base de datos
+
+        cur = mysql.connection.cursor()
+
+        #Actualizo los datos de la base de datos
+
+        cur.execute('UPDATE cliente SET nombre = %s, correo_electronico = %s, telefono = %s, departamento = %s WHERE idCliente=%s',
+                    (nombre,email,telefono,departamento,id_personal))
+        mysql.connection.commit()
+        cur.close()
+
+        #ACTUALIZAMOS LOS DATOS DE LA SESION DE USUARIO
+
+        session['nombre_sh'] = nombre
+        session['email'] = email
+        session['telefono'] = telefono
+        session['depto'] = departamento
+
+        return redirect(url_for('panel_cliente'))
+    
+    else:
+
+        id_personal = session.get('id', None)
+        nombre = session.get('nombre_sh',None)
+        email = session.get('email', None)
+        telefono = session.get('telefono', None)
+        departamento = session.get('depto', None)
+
+        datos= {
+
+            'id': id_personal,
+            'nombre': nombre,
+            'email': email,
+            'telefono': telefono,
+            'depto' : departamento
+        }
+
+        return redirect(url_for('panel_cliente'))
+        
 
 
 
@@ -92,13 +140,41 @@ def login():
             session['ap_pat'] = account[2]
             session['ap_mat'] = account[3]
             session['email'] = account[4]
-            session['telefono'] = account[7]
-            session['depto'] = account[8]
+            session['telefono'] = account[6]
+            session['depto'] = account[7]
 
             print('valores de SESSION: ', session)
             return redirect(url_for('panel_cliente'))
         else:
             return redirect(url_for('login'))
+#-------------------------------------------------------------------------------
+# -> Creación de la vista y la ruta para solicitudes de tickets
+
+@app.route('/solicitar_ticket', methods = ['GET','POST'])
+def solicitar_ticket():
+    if request.method == 'POST':
+        problemas = request.form['common_problems']
+        descripcion = request.form['description']
+        time = datetime.now().strftime('%Y-%m-%d')
+        #obtengo el id de mi cliente
+        id_cliente = session.get('id', None)
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("INSERT INTO tickets (Problema, Descripcion_problema, fecha_expedicion, idCliente) VALUES (%s, %s, %s, %s)",
+            (problemas, descripcion, time, id_cliente))
+            mysql.connection.commit()
+            cur.close()
+            flash('Los registros se han cargado satisfactoriamente', 'success')
+            return redirect(url_for('panel_cliente'))
+        
+        except Exception as e:
+            error_message = "Error al registrar el incidente" + str(e)
+            flash('No se cargaron los registros ' + error_message, 'error')
+
+
+    return render_template('solicitud_ticket.html')
+
+
 
 
 
