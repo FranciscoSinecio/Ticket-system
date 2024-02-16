@@ -16,8 +16,25 @@ function closePasswordModal() {
 }
 
 function confirmProfileChanges() {
-    // agregar aquí la lógica para confirmar los cambios antes de enviar el formulario.
-    // mostrar un mensaje de confirmación o solicitar una confirmación adicional.
+
+    //OBTENEMOS LOS DATOS DEL formulario
+    var formData = new  FormData(document.getElementById('editModal').querySelector('form'));
+
+    fetch('/edit_profile',{
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok){
+            throw new Error('Hobo un problema al guardar los cambios.');
+        }
+        //si la respuesta es exitosa, mostrar un mensaje y recargar la pagina
+        alert('¡Los cambios se han guardado exitosamente!');
+        window.location.reload(); 
+    })
+    .catch(error =>{
+        alert(error.message);
+    });
 }
 
 function confirmPasswordChange() {

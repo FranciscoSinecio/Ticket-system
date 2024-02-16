@@ -84,7 +84,7 @@ def edit_profile():
         
         #ejecutamos la sentencia de mysql
 
-        mysql.connection.comit()
+        mysql.connection.commit()
         cur.close()
 
         #Actualizamos los datos de la sesion de usuario 
