@@ -167,12 +167,12 @@ def solicitar_ticket():
             (problemas, descripcion, time, id_cliente, 'abierto'))
             mysql.connection.commit()
             cur.close()
-            flash('Los registros se han cargado satisfactoriamente', 'success')
+            #flash('Los registros se han cargado satisfactoriamente', 'success')
             return redirect(url_for('panel_cliente'))
         
         except Exception as e:
             error_message = "Error al registrar el incidente" + str(e)
-            flash('No se cargaron los registros ' + error_message, 'error')
+            #flash('No se cargaron los registros ' + error_message, 'error')
 
 
     return render_template('solicitud_ticket.html')
