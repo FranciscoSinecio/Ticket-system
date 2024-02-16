@@ -134,7 +134,6 @@ def login():
         account = cur.fetchone()
         print (account)
         
-        
 
         if account:
             session['logueado']=True
@@ -149,7 +148,8 @@ def login():
             print('valores de SESSION: ', session)
             return redirect(url_for('panel_cliente'))
         else:
-            return redirect(url_for('login'))
+            return render_template('login.html')
+        abort(400)  
 #-------------------------------------------------------------------------------
 # -> Creación de la vista y la ruta para solicitudes de tickets
 
@@ -163,8 +163,8 @@ def solicitar_ticket():
         id_cliente = session.get('id', None)
         try:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO tickets (Problema, Descripcion_problema, fecha_expedicion, idCliente) VALUES (%s, %s, %s, %s)",
-            (problemas, descripcion, time, id_cliente))
+            cur.execute("INSERT INTO tickets (Problema, Descripcion_problema, fecha_expedicion, idCliente, status ) VALUES (%s, %s, %s, %s,%s)",
+            (problemas, descripcion, time, id_cliente, 'abierto'))
             mysql.connection.commit()
             cur.close()
             flash('Los registros se han cargado satisfactoriamente', 'success')
@@ -177,8 +177,56 @@ def solicitar_ticket():
 
     return render_template('solicitud_ticket.html')
 
+@app.route('/ver_tickets')
+def ver_tickets():
+    #obtengo el id del cliente:
+    id_cliente = session.get('id',None)
+    print(f"Sesion del cliente es ->{id_cliente}")
+    cur = mysql.connection.cursor()
+    cur.execute("""
+                    SELECT 
+                        t.id_ticket,
+                        c.nombre,
+                        c.apellido_paterno,
+                        c.departamento,
+                        t.fecha_expedicion,
+                        t.Problema,
+                        t.Descripcion_problema,
+                        t.status
+                    FROM 
+                        tickets t
+                    JOIN 
+                        cliente c ON t.idCliente = c.idCliente
+                    WHERE
+                        c.idCliente = %s
+                        """,(id_cliente,))
+    tickets = cur.fetchall()
 
+    cur.close()
 
+    print(f' esta es la info que se envia al fron {tickets}')
+    
+
+    return render_template('mis_tickets.html', tickets = tickets)
+
+@app.route('/cancelar_ticket/<int:id_ticket>', methods=['POST'])
+def cancelar_ticket(id_ticket):
+    proceso = request.method
+    print (f"el proceso es {proceso}")
+    if request.method == 'POST':  
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM tickets WHERE id_ticket = %s AND status = 'abierto'",
+                    (id_ticket,))
+        ticket = cur.fetchone()
+        if ticket:
+            # Actualizar el estado del ticket a 'cancelado'
+            cur.execute("UPDATE tickets SET status = 'cancelado' WHERE id_ticket = %s", (id_ticket,))
+            mysql.connection.commit()
+            cur.close()
+            flash('El ticket ha sido cancelado exitosamente', 'success')
+        else:
+            flash('No se pudo cancelar el ticket. Puede que ya esté cerrado o no exista.', 'error')
+        return redirect(url_for('ver_tickets'))
 
 
 if __name__ =='__main__':

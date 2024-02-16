@@ -12,6 +12,7 @@
 <body>
 
   <!-- Header -->
+ 
   <header class="header">
       <div class="row">
         <div class="col">
@@ -33,9 +34,9 @@
     <div>
     </div>
     <div class="nav-btns">
-      <a class="btn btn-primary" href="#"><i class="fas fa-user"></i> Administrar Perfil</a>
-      <a class="btn btn-success" href="#"><i class="fas fa-ticket-alt"></i> Solicitar Ticket</a>
-      <a class="btn btn-info" href="#"><i class="fas fa-list-alt"></i> Mis Tickets</a>
+      <a class="btn btn-primary" href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a class="btn btn-success" href="{{ url_for('solicitar_ticket') }}"><i class="fas fa-ticket-alt"></i> Solicitar Ticket</a>
+      <a class="btn btn-info" href="{{ url_for('panel_cliente') }}"><i class="fas fa-list-alt"></i> Mis Tickets</a>
     </div>
   </nav>
   
@@ -57,32 +58,23 @@
         </tr>
       </thead>
       <tbody>
-        <!-- tabla con datos dinámicos usando JavaScript -->
-        <!-- estático -->
+        {%  for elemento in tickets %}
         <tr>
-          <td>001</td>
-          <td>Kevin Ramos</td>
-          <td>Logistica</td>
-          <td>13/02/2024</td>
-          <td>Errores de software</td>
-          <td>Problemas con el email</td>
-          <td>Abierto</td>
-          <td><button class="btn btn-danger" onclick="confirmarCancelar(1)">Cancelar</button></td>
+        
+          <td>{{ elemento.0 }}</td>
+          <td>{{ elemento.1 }} {{ elemento.2 }}</td>
+          <td>{{ elemento.3 }}</td>
+          <td>{{ elemento.4 }}</td>
+          <td>{{ elemento.5 }}</td>
+          <td>{{ elemento.6 }}</td>
+          <td>{{ elemento.7 }}</td>
+          <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ elemento.0 }}')">Cancelar</button></td>
+        
         </tr>
-        <tr>
-          <td>002</td>
-          <td>Jorge Ramirez</td>
-          <td>Procesos</td>
-          <td>11/02/2024</td>
-          <td>Fallas de office</td>
-          <td>Licencia vencida de office</td>
-          <td>Cerrado</td>
-          <td><button class="btn btn-danger" onclick="confirmarCancelar(2)">Cancelar</button></td>
-        </tr>
-        <!-- filas según sea necesario -->
+        {% endfor %}
       </tbody>
     </table>
-   </div>
+  </div>
   </div>
 
   <!-- Footer -->
@@ -102,14 +94,25 @@
   <script>
     function confirmarCancelar(ticketId) {
       if (confirm('¿Seguro desea cancelar el ticket?')) {
-        // implementar la lógica para cancelar el ticket
-        // se podra enviar una solicitud AJAX al servidor para eliminar el ticket de la base de datos
-        // mensaje de confirmación
-        alert('Ticket cancelado exitosamente');
-        // mensaje de alerta indicando que el ticket fue cancelado
+        // Enviar una solicitud AJAX al servidor para cancelar el ticket
+        fetch(`/cancelar_ticket/${ticketId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Ticket cancelado exitosamente');
+                window.location.reload(); // Recargar la página después de la cancelación
+            } else {
+                alert('Hubo un error al cancelar el ticket.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
       }
     }
-
+  
     function goBack() {
       window.history.back();
     }
