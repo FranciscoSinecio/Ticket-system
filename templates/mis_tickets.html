@@ -27,7 +27,7 @@
         </div>
       </div>
   </header>
-  
+
    <!-- nav -->
   <nav class="navbar navbar-custom">
     <div>
@@ -42,13 +42,16 @@
 
   <!-- Contenido principal -->
   <div class="container mt-4">
+   <div class="table-wrapper">
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>No ticket</th>
-          <th>Fecha</th>
-          <th>Descripción</th>
+          <th>N°ticket</th>
+          <th>Autor</th>
           <th>Departamento</th>
+          <th>Fecha</th>
+          <th>Clasificación</th>
+          <th>Detalle</th>
           <th>Status</th>
           <th>Cancelar</th>
         </tr>
@@ -58,23 +61,28 @@
         <!-- estático -->
         <tr>
           <td>001</td>
+          <td>Kevin Ramos</td>
+          <td>Logistica</td>
           <td>13/02/2024</td>
-          <td>Problema con el correo electrónico</td>
-          <td>Soporte Técnico</td>
+          <td>Errores de software</td>
+          <td>Problemas con el email</td>
           <td>Abierto</td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar(1)">Cancelar</button></td>
         </tr>
         <tr>
           <td>002</td>
-          <td>14/02/2024</td>
-          <td>Problema de acceso al sistema</td>
-          <td>Departamento de TI</td>
+          <td>Jorge Ramirez</td>
+          <td>Procesos</td>
+          <td>11/02/2024</td>
+          <td>Fallas de office</td>
+          <td>Licencia vencida de office</td>
           <td>Cerrado</td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar(2)">Cancelar</button></td>
         </tr>
         <!-- filas según sea necesario -->
       </tbody>
     </table>
+   </div>
   </div>
 
   <!-- Footer -->
