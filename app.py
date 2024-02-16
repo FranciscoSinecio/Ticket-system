@@ -62,28 +62,32 @@ def admin_cliente():
     }
 
     return render_template(('admincliente.html'),datos = datos)
+#----------------------------------------------------------------------------------------------
+# -> 15/02/2024
 
 @app.route('/edit_profile', methods=('GET','POST'))
 def edit_profile():
     if request.method == 'POST':
-        id_personal =  session.get['id', None]
+        
+        id_personal = session.get('id', None)
         nombre = request.form['name']
         email = request.form['email']
         telefono = request.form['phone']
         departamento = request.form['department']
 
-        #Activamos el cursor para realizar los cambios en base de datos
-
         cur = mysql.connection.cursor()
 
-        #Actualizo los datos de la base de datos
+        #actualización de la base de datos
 
-        cur.execute('UPDATE cliente SET nombre = %s, correo_electronico = %s, telefono = %s, departamento = %s WHERE idCliente=%s',
-                    (nombre,email,telefono,departamento,id_personal))
-        mysql.connection.commit()
+        cur.execute('UPDATE cliente SET nombre = %s, correo_electronico = %s, telefono = %s, departamento = %s WHERE idCliente =%s',
+                    (nombre, email, telefono, departamento, id_personal))
+        
+        #ejecutamos la sentencia de mysql
+
+        mysql.connection.comit()
         cur.close()
 
-        #ACTUALIZAMOS LOS DATOS DE LA SESION DE USUARIO
+        #Actualizamos los datos de la sesion de usuario 
 
         session['nombre_sh'] = nombre
         session['email'] = email
@@ -95,31 +99,30 @@ def edit_profile():
     else:
 
         id_personal = session.get('id', None)
-        nombre = session.get('nombre_sh',None)
+        nombre = session.get('nombre_sh', None)
+        ap_paterno = session.get('ap_pat', None)
+        ap_materno = session.get('ap_mat', None)
         email = session.get('email', None)
         telefono = session.get('telefono', None)
         departamento = session.get('depto', None)
-
-        datos= {
-
+        datos = {
             'id': id_personal,
             'nombre': nombre,
+            'ap_paterno': ap_paterno,
+            'ap_materno': ap_materno,
             'email': email,
             'telefono': telefono,
-            'depto' : departamento
+            'departamento': departamento
         }
 
-        return redirect(url_for('panel_cliente'))
-        
-
-
-
+        return render_template('edit_profile.html', datos=datos)
+#------------------------------------------------------------------------------------------------
 @app.route('/pruebas')
 def pruebas():
     print(url_for('pruebas'))
     return render_template('pruebas.html')
 
-
+#-------------------------------------------------------------------------------------------------
 @app.route('/login',methods=["GET","POST"])
 def login():
     if request.method == 'POST' and 'username' in request.form and 'password':
