@@ -125,7 +125,7 @@ def pruebas():
 #-------------------------------------------------------------------------------------------------
 @app.route('/login',methods=["GET","POST"])
 def login():
-    if request.method == 'POST' and 'username' in request.form and 'password':
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and request.form['password']:
         usuario = request.form['username']
         clave = request.form['password']
         #activo cursor
