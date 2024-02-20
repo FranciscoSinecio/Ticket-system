@@ -115,7 +115,7 @@ def edit_profile():
             'departamento': departamento
         }
 
-        return render_template('edit_profile.html', datos=datos)
+        return render_template('admincliente.html', datos=datos)
 #------------------------------------------------------------------------------------------------
 @app.route('/pruebas')
 def pruebas():
@@ -161,53 +161,55 @@ def solicitar_ticket():
         time = datetime.now().strftime('%Y-%m-%d')
         #obtengo el id de mi cliente
         id_cliente = session.get('id', None)
+        print(id_cliente)
+        print(problemas)
+        print(descripcion)
+        print(time)
         try:
+            
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO tickets (Problema, Descripcion_problema, fecha_expedicion, idCliente, status ) VALUES (%s, %s, %s, %s,%s)",
+            cur.execute("INSERT INTO tickets (Problema, Descripcion_problema, fecha_expedicion, idCliente, status) VALUES (%s, %s, %s, %s, %s)",
             (problemas, descripcion, time, id_cliente, 'abierto'))
+
             mysql.connection.commit()
             cur.close()
-            #flash('Los registros se han cargado satisfactoriamente', 'success')
-            return redirect(url_for('panel_cliente'))
-        
+            print("El registro se ha completado exitosamente")
+
         except Exception as e:
             error_message = "Error al registrar el incidente" + str(e)
-            #flash('No se cargaron los registros ' + error_message, 'error')
-
+            print (error_message)
 
     return render_template('solicitud_ticket.html')
 
 @app.route('/ver_tickets')
 def ver_tickets():
-    #obtengo el id del cliente:
-    id_cliente = session.get('id',None)
-    print(f"Sesion del cliente es ->{id_cliente}")
+    # Obtener el ID del cliente
+    id_cliente = session.get('id', None)
     cur = mysql.connection.cursor()
     cur.execute("""
-                    SELECT 
-                        t.id_ticket,
-                        c.nombre,
-                        c.apellido_paterno,
-                        c.departamento,
-                        t.fecha_expedicion,
-                        t.Problema,
-                        t.Descripcion_problema,
-                        t.status
-                    FROM 
-                        tickets t
-                    JOIN 
-                        cliente c ON t.idCliente = c.idCliente
-                    WHERE
-                        c.idCliente = %s
-                        """,(id_cliente,))
+        SELECT 
+            t.id_ticket,
+            c.nombre,
+            c.apellido_paterno,
+            c.departamento,
+            t.fecha_expedicion,
+            t.Problema,
+            t.Descripcion_problema,
+            t.status
+        FROM 
+            tickets t
+        JOIN 
+            cliente c ON t.idCliente = c.idCliente
+        WHERE
+            c.idCliente = %s
+        ORDER BY t.id_ticket DESC
+    """, (id_cliente,))
     tickets = cur.fetchall()
-
     cur.close()
+    print(f'info enviada al front end {tickets}')
 
-    print(f' esta es la info que se envia al fron {tickets}')
-    
+    return render_template('mis_tickets.html', tickets=tickets)
 
-    return render_template('mis_tickets.html', tickets = tickets)
 
 @app.route('/cancelar_ticket/<int:id_ticket>', methods=['POST'])
 def cancelar_ticket(id_ticket):

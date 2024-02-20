@@ -30,13 +30,12 @@
   </header>
 
    <!-- nav -->
-  <nav class="navbar navbar-custom">
-    <div>
-    </div>
+   <nav class="navbar navbar-custom">
+    <div></div>
     <div class="nav-btns">
-      <a class="btn btn-primary" href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Administrar Perfil</a>
-      <a class="btn btn-success" href="{{ url_for('solicitar_ticket') }}"><i class="fas fa-ticket-alt"></i> Solicitar Ticket</a>
-      <a class="btn btn-info" href="{{ url_for('panel_cliente') }}"><i class="fas fa-list-alt"></i> Mis Tickets</a>
+      <a id="editProfileBtn" class="btn btn-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a id="solicitarTicketBtn" class="btn btn-success" href="/solicitar_ticket"><i class="fas fa-ticket-alt"></i> Solicitar Ticket</a>
+      <a id="panelClienteBtn" class="btn btn-info" href="/panel_cliente"><i class="fas fa-list-alt"></i> Mis Tickets</a>
     </div>
   </nav>
   
@@ -116,6 +115,29 @@
     function goBack() {
       window.history.back();
     }
+  </script>
+  <script>
+     document.addEventListener('DOMContentLoaded', function() {
+    var editProfileBtn = document.getElementById('editProfileBtn');
+    var solicitarTicketBtn = document.getElementById('solicitarTicketBtn');
+    var panelClienteBtn = document.getElementById('panelClienteBtn');
+
+    editProfileBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      window.location.href = '/edit_profile';
+    });
+
+    solicitarTicketBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      window.location.href = '/solicitar_ticket';
+    });
+
+    panelClienteBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+      window.location.href = '/panel_cliente';
+    });
+  });
+
   </script>
 </body>
 </html>

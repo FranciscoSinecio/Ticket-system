@@ -42,5 +42,5 @@ window.addEventListener("scroll", function () {
 });
 
 function goBack() {
-    window.history.back();
+    window.location.href = "/panel_cliente";
 }
