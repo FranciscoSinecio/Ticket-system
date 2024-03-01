@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tickets</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="static/style6.css">
+</head>
+<body>
+
+  <!-- Header -->
+ 
+  <header class="header">
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-link" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Regresar
+          </button>
+        </div>
+        <div class="col text-center">
+          <h1>Consultar Tickets</h1>
+        </div>
+        <div class="col">
+          <!-- elementos al encabezado  -->
+        </div>
+      </div>
+  </header>
+
+   <!-- nav -->
+   <nav class="navbar navbar-custom">
+    <div></div>
+    <div class="nav-btns">
+      <a id="editProfileBtn" class="btn btn-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a id="consultarTicketsBtn" class="btn btn-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Consultar Tickets</a>
+      <a id="reportesBtn" class="btn btn-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
+      <a id="departamentosBtn" class="btn btn-success" href="/departamentos"><i class="fas fa-building"></i> Departamentos</a>
+      <a id="gestionUsuariosBtn" class="btn btn-danger" href="/gestion_usuarios"><i class="fas fa-users"></i> Gestión de Usuarios</a>
+    </div>
+  </nav>
+  
+
+  <!-- Contenido principal -->
+  <div class="container mt-4">
+   <div class="table-wrapper">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>N°ticket</th>
+          <th>Autor</th>
+          <th>Departamento</th>
+          <th>Fecha</th>
+          <th>Clasificación</th>
+          <th>Detalle</th>
+          <th>Status</th>
+          <th>Asignar Auxiliar</th>
+          <th>Cancelar</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Datos simulados -->
+        <tr>
+          <td>1</td>
+          <td>John Doe</td>
+          <td>Departamento A</td>
+          <td>2024-02-28</td>
+          <td>Clasificación A</td>
+          <td>Detalles del ticket A</td>
+          <td>En Proceso</td>
+          <td>
+            <select class="form-control" onchange="assignAuxiliar(this.value, '1')">
+              <option value="">Seleccionar Auxiliar</option>
+              <option value="auxiliar1">Auxiliar 1</option>
+              <option value="auxiliar2">Auxiliar 2</option>
+              <option value="auxiliar3">Auxiliar 3</option>
+            </select>
+          </td>
+          <td><button class="btn btn-danger" onclick="confirmarCancelar('1')">Cancelar</button></td>
+          <td><button class="btn btn-danger" onclick="confirmarEliminar('1')">Eliminar</button></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Jane Smith</td>
+          <td>Departamento B</td>
+          <td>2024-02-27</td>
+          <td>Clasificación B</td>
+          <td>Detalles del ticket B</td>
+          <td>Abierto</td>
+          <td>
+            <select class="form-control" onchange="assignAuxiliar(this.value, '2')">
+              <option value="">Seleccionar Auxiliar</option>
+              <option value="auxiliar1">Auxiliar 1</option>
+              <option value="auxiliar2">Auxiliar 2</option>
+              <option value="auxiliar3">Auxiliar 3</option>
+            </select>
+          </td>
+          <td><button class="btn btn-danger" onclick="confirmarCancelar('2')">Cancelar</button></td>
+          <td><button class="btn btn-danger" onclick="confirmarEliminar('2')">Eliminar</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  </div>
+
+  <!-- Botón para enviar comentarios u observaciones -->
+<button id="enviarComentariosBtn" class="btn btn-primary" data-toggle="modal" data-target="#comentariosModal">Enviar Comentarios u Observaciones</button>
+
+  
+  <!-- Modal para comentarios u observaciones -->
+  <div class="modal fade" id="comentariosModal" tabindex="-1" role="dialog" aria-labelledby="comentariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="comentariosModalLabel">Enviar Comentarios u Observaciones</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="tipoUsuario">Seleccione el tipo de usuario:</label>
+              <select class="form-control" id="tipoUsuario">
+                <option value="cliente">Cliente</option>
+                <option value="auxiliar">Auxiliar</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="usuario">Seleccione el usuario:</label>
+              <select class="form-control" id="usuario">
+                <!-- Aquí se cargarán dinámicamente los usuarios disponibles según el tipo seleccionado -->
+                <!-- Para este ejemplo, dejaremos estático -->
+                <option value="usuario1">Usuario 1</option>
+                <option value="usuario2">Usuario 2</option>
+                <option value="usuario3">Usuario 3</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="comentarios">Comentarios u Observaciones:</label>
+              <textarea class="form-control" id="comentarios" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="enviarComentarios()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p>&copy; 2024 - Todos los derechos reservados</p>
+        </div>
+      </div>
+  </footer>
+
+  <!-- Bootstrap JS (jQuery debe incluirse antes) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Script personalizado -->
+  <script>
+    
+    function confirmarCancelar(ticketId) {
+      if (confirm('¿Seguro desea cancelar el ticket?')) {
+        // Enviar una solicitud AJAX al servidor para cancelar el ticket
+        fetch(`/cancelar_ticket/${ticketId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Ticket cancelado exitosamente');
+                window.location.reload(); // Recargar la página después de la cancelación
+            } else {
+                alert('Hubo un error al cancelar el ticket.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+      }
+    }
+  
+    function confirmarEliminar(ticketId) {
+      if (confirm('¿Seguro desea eliminar el ticket?')) {
+        // Enviar una solicitud AJAX al servidor para eliminar el ticket
+        fetch(`/eliminar_ticket/${ticketId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Ticket eliminado exitosamente');
+                window.location.reload(); // Recargar la página después de la eliminación
+            } else {
+                alert('Hubo un error al eliminar el ticket.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+      }
+    }
+  
+    function goBack() {
+      window.history.back();
+    }
+
+    function assignAuxiliar(auxiliarId, ticketId) {
+      // Aquí puedes enviar una solicitud AJAX al servidor para asignar el auxiliar al ticket
+      console.log(`Ticket ${ticketId} asignado a auxiliar ${auxiliarId}`);
+    }
+
+    function enviarComentarios() {
+      const tipoUsuario = document.getElementById('tipoUsuario').value;
+      const usuario = document.getElementById('usuario').value;
+      const comentarios = document.getElementById('comentarios').value;
+      
+      // Aquí puedes enviar los comentarios a través de una solicitud AJAX al servidor
+      console.log('Tipo de usuario:', tipoUsuario);
+      console.log('Usuario seleccionado:', usuario);
+      console.log('Comentarios u observaciones:', comentarios);
+      
+      // Cerrar el modal después de enviar los comentarios
+      $('#comentariosModal').modal('hide');
+    }
+  </script>
+</body>
+</html>

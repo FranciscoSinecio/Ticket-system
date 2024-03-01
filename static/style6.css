@@ -1,0 +1,153 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #e74c3c;
+  --bg-color: #f8f9fa;
+  --text-color: #fff; /* Cambiado el color del texto a blanco */
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: url('backgroundcliente.jpg') center/cover no-repeat;
+  color: var(--text-color);
+  margin: 0;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+
+.header {
+  background-color: #4e54c8; /* Cambiado a transparente */
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000; /* Para asegurar que el header esté por encima del contenido */
+}
+
+.footer {
+  background-color: #8f94fb; 
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+  width: 100%;
+  position: absolute; /* Cambia la posición a absoluta */
+  bottom: -20px; /* Coloca el footer en la parte inferior */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 50px auto 50px; /* Agrega margen inferior */
+  background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+
+.header h1 {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center; /* Centrar el título */
+}
+
+.btn-link {
+  padding: 8px 16px;
+  color: #fff;
+  font-size: 16px;
+  background-color: var(--primary-color); /* Resalta el botón de regresar */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  position: absolute;
+  left: 100px; /* Ajustar la posición del botón de regresar hacia la izquierda */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.btn-link:hover {
+  background-color: #2980b9; /* Cambia el color al pasar el ratón */
+  text-decoration: none;
+}
+
+.btn-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.navbar {
+  background-color: #000000;
+  color: #fff;
+  padding: 10px 20px;
+  text-align: center;
+  position: fixed;
+  top: 60px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end; /* Para alinear los elementos a la derecha */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.nav-link {
+  color: #fff !important; /* Forzar el color de texto */
+  margin-left: 15px;
+  font-size: 18px;
+  text-decoration: none;
+  border: none;
+  background: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: transform 0.4s;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+  transform: scale(1.05);
+}
+
+.nav-link:active {
+  transform: scale(0.95);
+}
+
+.table-wrapper {
+  max-height: 400px; /* Establece la altura máxima del contenedor */
+  overflow-y: auto; /* Habilita el desplazamiento vertical cuando el contenido excede la altura máxima */
+}
+
+/* Estilos para el botón de enviar comentarios */
+#enviarComentariosBtn {
+  margin-top: 20px; /* Espacio superior */
+  margin-bottom: 20px; /* Espacio inferior */
+  width: 300px; /* Ancho del botón */
+  position: absolute; /* Posicionamiento absoluto */
+  bottom: 30px; /* Distancia desde la parte inferior */
+  left: 60px; /* Distancia desde la izquierda */
+}
+
+/* Estilo para el texto "Seleccione el tipo de usuario:" y "Comentarios u Observaciones:" */
+#tipoUsuarioLabel,
+#comentariosLabel {
+  color: black; /* Cambiar el color del texto a negro */
+}
+/* Estilo para el texto dentro de la ventana modal */
+.modal-content label {
+  color: black; /* Cambiar el color del texto a negro */
+}
+
+/* Estilo para el título del modal */
+.modal-title {
+  color: black; /* Cambiar el color del texto a negro */
+}
+
+
