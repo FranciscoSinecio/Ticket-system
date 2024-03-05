@@ -6,6 +6,8 @@
   <title>Lista de Tickets</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="static/style6.css">
 </head>
@@ -58,6 +60,7 @@
           <th>Asignar Auxiliar</th>
           <th>Cancelar</th>
           <th>Eliminar</th>
+          <th>Actualizar</th>
         </tr>
       </thead>
       <tbody>
@@ -79,7 +82,8 @@
             </select>
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('1')">Cancelar</button></td>
-          <td><button class="btn btn-danger" onclick="confirmarEliminar('1')">Eliminar</button></td>
+          <td><button class="btn btn-danger" onclick="confirmarEliminar('1')"><span class="glyphicon glyphicon-trash"></span></button></td>
+          <td><button class="btn btn-primary" onclick="actualizarTicket('1')">Actualizar</button></td>
         </tr>
         <tr>
           <td>2</td>
@@ -99,29 +103,7 @@
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('2')">Cancelar</button></td>
           <td><button class="btn btn-danger" onclick="confirmarEliminar('2')">Eliminar</button></td>
-        </tr>-->
-
-        {% for ticket in tickets %}
-          <tr>
-              <td> {{ ticket.0 }} </td>
-              <td> {{ ticket.1 }} {{ ticket.2 }}</td>
-              <td> {{ ticket.3 }}</td>
-              <td> {{ ticket.4 }} </td>
-              <td> {{ ticket.5 }} </td>
-              <td> {{ ticket.6 }}</td>
-              <td> {{ ticket.7 }}</td>
-              <td>
-                <select class="form-control" onchange="assignAuxiliar(this.value, '{{ ticket.id_ticket }}')">
-                  <option value="">Seleccionar Auxiliar</option>
-                  <option value="auxiliar1">Auxiliar 1</option>
-                  <option value="auxiliar2">Auxiliar 2</option>
-                  <option value="auxiliar3">Auxiliar 3</option>
-              </select>
-              </td>
-              <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket.id_ticket }}')">Cancelar</button></td>
-              <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket.id_ticket }}')">Eliminar</button></td>
-          </tr>
-        {% endfor %}
+        </tr>
       </tbody>
     </table>
   </div>
@@ -231,7 +213,7 @@
         .catch(error => console.error('Error:', error));
       }
     }
-  
+
     function goBack() {
       window.history.back();
     }
@@ -258,6 +240,12 @@
       alert("No se pudiero cargar los ticket. Por favor, inténtelo de nuevo, más tarde !! ");
       wwindow.location.href = "/panel_jefe";
     }*/
+  </script>
+   <script>
+    function actualizarTicket(ticketId) {
+      // Aquí puedes escribir el código para manejar la acción de actualización del ticket
+      console.log('Actualizando ticket:', ticketId);
+    }
   </script>
 </body>
 </html>
