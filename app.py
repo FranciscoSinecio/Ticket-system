@@ -247,7 +247,7 @@ def panel_jefe():
     return render_template('panel_jefe.html',id_personal = id_personal, nombre=nombre, paterno = paterno, materno = materno)
 
 @app.route('/consultaJefeTicket')
-def consulta_jefe():
+def consultaJefeTicket():
     #obtnemos todas la consulta de los tickects
 
     try:
