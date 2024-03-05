@@ -64,6 +64,29 @@
         </tr>
       </thead>
       <tbody>
+        {% for ticket in tickets %}
+    <tr>
+      <td>{{ ticket[0] }}</td> <!-- Número de ticket -->
+      <td>{{ ticket[1] }} {{ ticket[2] }}</td> <!-- Nombre y Apellido del cliente -->
+      <td>{{ ticket[3] }}</td> <!-- Departamento -->
+      <td>{{ ticket[4] }}</td> <!-- Fecha de expedición -->
+      <td>{{ ticket[5] }}</td> <!-- Problema -->
+      <td>{{ ticket[6] }}</td> <!-- Descripción del problema -->
+      <td>{{ ticket[7] }}</td> <!-- Status -->
+      <td>
+        <select class="form-control" onchange="assignAuxiliar(this.value, '{{ ticket[0] }}')">
+          <option value="">Seleccionar Auxiliar</option>
+          <option value="auxiliar1">Auxiliar 1</option>
+          <option value="auxiliar2">Auxiliar 2</option>
+          <option value="auxiliar3">Auxiliar 3</option>
+        </select>
+      </td>
+      <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
+      <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')">Eliminar</button></td>
+      <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}')">Actualizar</button></td>
+    </tr>
+  {% endfor %}
+        
         <!-- Datos simulados -->
         <!--<tr>
           <td>1</td>
@@ -103,7 +126,7 @@
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('2')">Cancelar</button></td>
           <td><button class="btn btn-danger" onclick="confirmarEliminar('2')">Eliminar</button></td>
-        </tr>
+        </tr>-->
       </tbody>
     </table>
   </div>
