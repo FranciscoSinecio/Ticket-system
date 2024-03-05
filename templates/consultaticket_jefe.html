@@ -82,7 +82,7 @@
         </select>
       </td>
       <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
-      <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')">Borrar</button><span class="glyphicon glyphicon-trash"></span></td>
+      <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><span class="glyphicon glyphicon-trash"></span></button></td>
       <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}')">Actualizar</button></td>
     </tr>
   {% endfor %}
