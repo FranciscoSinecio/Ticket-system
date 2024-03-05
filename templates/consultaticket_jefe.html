@@ -58,6 +58,7 @@
           <th>Asignar Auxiliar</th>
           <th>Cancelar</th>
           <th>Eliminar</th>
+          <th>Actualizar</th>
         </tr>
       </thead>
       <tbody>
@@ -80,6 +81,7 @@
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('1')">Cancelar</button></td>
           <td><button class="btn btn-danger" onclick="confirmarEliminar('1')">Eliminar</button></td>
+          <td><button class="btn btn-primary" onclick="actualizarTicket('1')">Actualizar</button></td>
         </tr>
         <tr>
           <td>2</td>
@@ -99,6 +101,7 @@
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('2')">Cancelar</button></td>
           <td><button class="btn btn-danger" onclick="confirmarEliminar('2')">Eliminar</button></td>
+          <td><button class="btn btn-primary" onclick="actualizarTicket('2')">Actualizar</button></td>
         </tr>
       </tbody>
     </table>
@@ -209,7 +212,7 @@
         .catch(error => console.error('Error:', error));
       }
     }
-  
+
     function goBack() {
       window.history.back();
     }
@@ -231,6 +234,12 @@
       
       // Cerrar el modal después de enviar los comentarios
       $('#comentariosModal').modal('hide');
+    }
+  </script>
+   <script>
+    function actualizarTicket(ticketId) {
+      // Aquí puedes escribir el código para manejar la acción de actualización del ticket
+      console.log('Actualizando ticket:', ticketId);
     }
   </script>
 </body>
