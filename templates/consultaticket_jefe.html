@@ -6,6 +6,8 @@
   <title>Lista de Tickets</title>
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="static/style6.css">
 </head>
@@ -80,7 +82,7 @@
             </select>
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('1')">Cancelar</button></td>
-          <td><button class="btn btn-danger" onclick="confirmarEliminar('1')">Eliminar</button></td>
+          <td><button class="btn btn-danger" onclick="confirmarEliminar('1')"><span class="glyphicon glyphicon-trash"></span></button></td>
           <td><button class="btn btn-primary" onclick="actualizarTicket('1')">Actualizar</button></td>
         </tr>
         <tr>
@@ -100,7 +102,7 @@
             </select>
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('2')">Cancelar</button></td>
-          <td><button class="btn btn-danger" onclick="confirmarEliminar('2')">Eliminar</button></td>
+          <td><button class="btn btn-danger" onclick="confirmarEliminar('2')"><span class="glyphicon glyphicon-trash"></span></button></td>
           <td><button class="btn btn-primary" onclick="actualizarTicket('2')">Actualizar</button></td>
         </tr>
       </tbody>
