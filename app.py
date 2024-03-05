@@ -239,8 +239,50 @@ def cancelar_ticket(id_ticket):
 
 @app.route('/panel_jefe')
 def panel_jefe():
+    id_personal = session.get('id',None)
+    nombre = session.get('nombre_sh',None)
+    paterno = session.get('ap_pat',None)
+    materno = session.get('ap_mat', None)
     
-    return render_template('panel_jefe.html')
+    return render_template('panel_jefe.html',id_personal = id_personal, nombre=nombre, paterno = paterno, materno = materno)
+
+@app.route('/consultaJefeTicket')
+def consulta_jefe():
+    #obtnemos todas la consulta de los tickects
+
+    try:
+        
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            SELECT 
+                t.id_ticket,
+                c.nombre,
+                c.apellido_paterno,
+                d.nombre_departamento,
+                t.fecha_expedicion,
+                t.Problema,
+                t.Descripcion_problema,
+                t.status
+            FROM 
+                tickets t
+            JOIN 
+                cliente c ON t.idCliente = c.idCliente
+            JOIN
+                departamentos d ON c.idDepartamento = d.idDepartamento
+            ORDER BY t.id_ticket DESC
+        """)
+
+        #obtnemos el resultado de la consulta
+
+        tickets = cur.fetchall()
+
+        cur.close()
+        
+
+        return render_template('consultaticket_jefe.html',tickets = tickets)
+    
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 if __name__ =='__main__':
     app.run(debug = True, )
