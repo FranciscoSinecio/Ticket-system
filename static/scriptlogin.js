@@ -1,4 +1,4 @@
-document.querySelector("#loginForm").addEventListener("submit", function(event) {
+/*document.querySelector("#loginForm").addEventListener("submit", function(event) {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
     if (!isValidEmail(username) || !isValidPassword(password)) {
@@ -12,3 +12,4 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
+*/
