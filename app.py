@@ -143,13 +143,18 @@ def login():
             session['ap_mat'] = account[3]
             session['email'] = account[4]
             session['telefono'] = account[6]
-            session['depto'] = account[7]
+            session['rol'] = account[7]
+            #session['rol'] = account[8]
 
             print('valores de SESSION: ', session)
-            return redirect(url_for('panel_cliente'))
+            if session['rol'] == 'jefe':
+                return redirect(url_for('panel_jefe'))
+                
+            else:
+                return redirect(url_for('panel_cliente'))
         else:
             return render_template('login.html')
-        abort(400)  
+        abort(400)
 #-------------------------------------------------------------------------------
 # -> Creación de la vista y la ruta para solicitudes de tickets
 
@@ -191,7 +196,7 @@ def ver_tickets():
             t.id_ticket,
             c.nombre,
             c.apellido_paterno,
-            c.departamento,
+            d.nombre_departamento,
             t.fecha_expedicion,
             t.Problema,
             t.Descripcion_problema,
@@ -200,6 +205,8 @@ def ver_tickets():
             tickets t
         JOIN 
             cliente c ON t.idCliente = c.idCliente
+        JOIN
+            departamentos d ON c.idDepartamento = d.idDepartamento
         WHERE
             c.idCliente = %s
         ORDER BY t.id_ticket DESC
@@ -230,6 +237,10 @@ def cancelar_ticket(id_ticket):
             flash('No se pudo cancelar el ticket. Puede que ya esté cerrado o no exista.', 'error')
         return redirect(url_for('ver_tickets'))
 
+@app.route('/panel_jefe')
+def panel_jefe():
+    
+    return render_template('panel_jefe.html')
 
 if __name__ =='__main__':
     app.run(debug = True, )
