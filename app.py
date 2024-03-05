@@ -148,8 +148,8 @@ def login():
 
             print('valores de SESSION: ', session)
             if session['rol'] == 'jefe':
-                #return redirect(url_for('panel_jefe'))
-                return 'hola'
+                return redirect(url_for('panel_jefe'))
+                
             else:
                 return redirect(url_for('panel_cliente'))
         else:
@@ -237,6 +237,10 @@ def cancelar_ticket(id_ticket):
             flash('No se pudo cancelar el ticket. Puede que ya esté cerrado o no exista.', 'error')
         return redirect(url_for('ver_tickets'))
 
+@app.route('/panel_jefe')
+def panel_jefe():
+    
+    return render_template('panel_jefe.html')
 
 if __name__ =='__main__':
     app.run(debug = True, )
