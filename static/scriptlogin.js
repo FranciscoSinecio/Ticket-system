@@ -9,7 +9,7 @@ document.querySelector("#loginForm").addEventListener("submit", function(event) 
 
 // Función para validar el correo electrónico
 function isValidEmail(email) {
-    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var emailRegex = /^[a-zA-Z0-9_]+@[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+$/; 
     return emailRegex.test(email);
 }
 
