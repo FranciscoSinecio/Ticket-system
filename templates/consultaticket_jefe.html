@@ -62,7 +62,7 @@
       </thead>
       <tbody>
         <!-- Datos simulados -->
-        <tr>
+        <!--<tr>
           <td>1</td>
           <td>John Doe</td>
           <td>Departamento A</td>
@@ -99,7 +99,29 @@
           </td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('2')">Cancelar</button></td>
           <td><button class="btn btn-danger" onclick="confirmarEliminar('2')">Eliminar</button></td>
-        </tr>
+        </tr>-->
+
+        {% for ticket in tickets %}
+          <tr>
+              <td> {{ ticket.0 }} </td>
+              <td> {{ ticket.1 }} {{ ticket.2 }}</td>
+              <td> {{ ticket.3 }}</td>
+              <td> {{ ticket.4 }} </td>
+              <td> {{ ticket.5 }} </td>
+              <td> {{ ticket.6 }}</td>
+              <td> {{ ticket.7 }}</td>
+              <td>
+                <select class="form-control" onchange="assignAuxiliar(this.value, '{{ ticket.id_ticket }}')">
+                  <option value="">Seleccionar Auxiliar</option>
+                  <option value="auxiliar1">Auxiliar 1</option>
+                  <option value="auxiliar2">Auxiliar 2</option>
+                  <option value="auxiliar3">Auxiliar 3</option>
+              </select>
+              </td>
+              <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket.id_ticket }}')">Cancelar</button></td>
+              <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket.id_ticket }}')">Eliminar</button></td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
@@ -232,6 +254,10 @@
       // Cerrar el modal después de enviar los comentarios
       $('#comentariosModal').modal('hide');
     }
+    /*window.onload = function(){
+      alert("No se pudiero cargar los ticket. Por favor, inténtelo de nuevo, más tarde !! ");
+      wwindow.location.href = "/panel_jefe";
+    }*/
   </script>
 </body>
 </html>

@@ -20,8 +20,8 @@ panel_jefe
 
     <div class="jumbotron text-center mb-5">
         <h2 class="display-4">¡Bienvenido, {{nombre}}!</h2>
-        <h2 style="font-size: 50px;">{{ap_paterno}} {{ap_materno}}</h2>
-        <h2 class="lead">ID: {{id_cliente}}</h2>
+        <h2 style="font-size: 50px;">{{paterno}} {{materno}}</h2>
+        <h2 class="lead">ID: {{id_personal}}</h2>
     </div>
 
     <div class="row">
@@ -30,7 +30,7 @@ panel_jefe
                 <div class="card-body">
                     <h5 class="card-title">Administrar Perfil</h5>
                     <p class="card-text">Personaliza y gestiona tu perfil.</p>
-                    <a href="" class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
+                    <a href="{{url_for('admin_cliente')}}" class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@ panel_jefe
                 <div class="card-body">
                     <h5 class="card-title">Consulta tickets</h5>
                     <p class="card-text">Consulta el estado de los tickets y su historial.</p>
-                    <a href="" class="btn btn-primary"><i class="fas fa-search"></i> Ir</a>
+                    <a href="{{ url_for('consulta_jefe')}}" class="btn btn-primary"><i class="fas fa-search"></i> Ir</a>
                 </div>
             </div>
         </div>
