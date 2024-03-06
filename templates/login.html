@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
     <link rel="stylesheet" href="static/style.css">
+    <!-- Incluir SweetAlert desde una CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -34,6 +36,38 @@
 </div>
 
 <script src="static/scriptlogin.js"></script>
+<script>
+    // Función para mostrar SweetAlert con mensaje de error
+    function showErrorAlert(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: message
+        });
+    }
+
+    // Escuchar el envío del formulario y mostrar SweetAlert según sea necesario
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        // Validación de correo y contraseña (reemplaza esto con tu propia validación)
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+
+        if (username === 'correo@ejemplo.com' && password === 'contraseña') {
+            // Si el inicio de sesión es exitoso, muestra SweetAlert de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Inicio de sesión exitoso',
+                text: '¡Bienvenido de nuevo!'
+            });
+        } else {
+            // Si el inicio de sesión falla, muestra SweetAlert de error
+            showErrorAlert('Correo o contraseña incorrectos. Por favor, inténtalo de nuevo.');
+        }
+
+        // Evitar el envío del formulario
+        event.preventDefault();
+    });
+</script>
 
 </body>
 </html>
