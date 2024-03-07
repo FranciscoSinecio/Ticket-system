@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
 from flask_mysqldb import MySQL
 from datetime import datetime
+
 
 app = Flask(__name__)
 app.secret_key = 'yes'
@@ -283,6 +284,7 @@ def consultaJefeTicket():
     
     except Exception as e:
         return f"Error: {str(e)}"
-
+    
+    
 if __name__ =='__main__':
     app.run(debug = True, )

@@ -39,6 +39,10 @@ body {
   bottom: -20px; /* Coloca el footer en la parte inferior */
 }
 
+.resaltado {
+  color: black;
+}
+
 .container {
   max-width: 1300px;
   margin: 50px auto 50px; /* Agrega margen inferior */

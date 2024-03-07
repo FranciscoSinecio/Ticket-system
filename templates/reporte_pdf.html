@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+    {% block estilos %}
+        <link rel="stylesheet" href="/static/style_pdf.css">
+    {% endblock %}
+
+    {% block titulo %}
+        
+        Reporte tickets
+
+    {% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="header">
+        <div class="company-title">
+            <img src="ruta/a/tu/logo.png" alt="Logo de Macuin Dashboards" style="max-width: 100px;">
+            <span class="title">Macuin Dashboards</span>
+        </div>
+        <div class="date">
+            Fecha: {{ fecha }}
+        </div>
+    </div>
+    
+    <h2 style="text-align: center;">Reporte de Tickets</h2>
+    
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>ID Ticket</th>
+                <th>Nombre Cliente</th>
+                <th>Apellido Paterno</th>
+                <th>Departamento</th>
+                <th>Fecha Expedición</th>
+                <th>Problema</th>
+                <th>Descripción Problema</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.id_ticket }}</td>
+                <td>{{ ticket.nombre }}</td>
+                <td>{{ ticket.apellido_paterno }}</td>
+                <td>{{ ticket.nombre_departamento }}</td>
+                <td>{{ ticket.fecha_expedicion }}</td>
+                <td>{{ ticket.Problema }}</td>
+                <td>{{ ticket.Descripcion_problema }}</td>
+                <td>{{ ticket.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
