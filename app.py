@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response,jsonify
 from flask_mysqldb import MySQL
 from datetime import datetime
 
@@ -149,13 +149,17 @@ def login():
 
             print('valores de SESSION: ', session)
             if session['rol'] == 'jefe':
-                return redirect(url_for('panel_jefe'))
+                
+                return redirect(url_for('panel_jefe')) 
                 
             else:
+                
                 return redirect(url_for('panel_cliente'))
         else:
-            return render_template('login.html')
-        abort(400)
+            error_message = "Usuario o contraseña incorrectos"
+            return  render_template('login.html', error_message = error_message)
+    return render_template('login.html')
+
 #-------------------------------------------------------------------------------
 # -> Creación de la vista y la ruta para solicitudes de tickets
 
