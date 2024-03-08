@@ -84,9 +84,9 @@
       <td>
         <select class="form-control" onchange="assignAuxiliar(this.value, '{{ ticket[0] }}')">
           <option value="">Seleccionar Auxiliar</option>
-          <option value="auxiliar1">Auxiliar 1</option>
-          <option value="auxiliar2">Auxiliar 2</option>
-          <option value="auxiliar3">Auxiliar 3</option>
+          {% for a in auxiliar %}
+          <option value="{{ a[0] }}}"> {{ a[0] }} {{ a[1] }}</option>
+          {% endfor %}
         </select>
       </td>
       <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
@@ -205,7 +205,7 @@
                 alert('Ticket eliminado exitosamente');
                 window.location.reload(); // Recargar la página después de la eliminación
             } else {
-                alert('Hubo un error al eliminar el ticket.');
+                alert('Hubo un error al eliminar el ticket x.');
             }
         })
         .catch(error => console.error('Error:', error));

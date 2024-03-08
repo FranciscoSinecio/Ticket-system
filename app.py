@@ -282,9 +282,16 @@ def consultaJefeTicket():
         tickets = cur.fetchall()
 
         cur.close()
-        
 
-        return render_template('consultaticket_jefe.html',tickets = tickets)
+        #realizamos la consulta para obtner a los auxiliares
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT nombre, apellido_paterno FROM cliente WHERE rol = 'auxiliar'")
+        auxiliar = cur.fetchall()
+        cur.close()
+        print (f'Esto se envia al front de auxiliares {auxiliar}')
+
+
+        return render_template('consultaticket_jefe.html',tickets = tickets, auxiliar = auxiliar )
     
     except Exception as e:
         return f"Error: {str(e)}"
@@ -294,10 +301,29 @@ def reportes():
     
     return render_template('reportes_jefe.html')
 
-@app.route('/elminar_ticket/<ticket_id>',methods = ['POST'])
+@app.route('/eliminar_ticket/<int:ticket_id>', methods=['POST'])
 def eliminar_ticket(ticket_id):
+    if request.method == 'POST':
+        try:
+            # Conectar a la base de datos
+            cur = mysql.connection.cursor()
 
-    if 
+            # Verificar si el ticket existe
+            cur.execute("SELECT * FROM tickets WHERE id_ticket = %s", (ticket_id,))
+            ticket = cur.fetchone()
+
+            if ticket:
+                # Eliminar el ticket de la base de datos
+                cur.execute("DELETE FROM tickets WHERE id_ticket = %s", (ticket_id,))
+                mysql.connection.commit()
+                cur.close()
+                return jsonify({'message': 'El ticket ha sido eliminado exitosamente'}), 200
+            else:
+                return jsonify({'error': 'No se pudo eliminar el ticket. Puede que no exista.'}), 404
+        except Exception as e:
+            return jsonify({'error': f"Error al eliminar el ticket: {str(e)}"}), 500
+    else:
+        return jsonify({'error': 'Método no permitido'}), 405
     
 if __name__ =='__main__':
     app.run(debug = True, )
