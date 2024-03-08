@@ -237,5 +237,26 @@
       console.log('Actualizando ticket:', ticketId);
     }
   </script>
+  <script>
+    $(document).ready(function() {
+        $('#tipoUsuario').change(function() {
+            var tipoUsuario = $(this).val();
+            $.ajax({
+                url: '/obtener_usuarios',
+                method: 'POST',
+                data: { tipoUsuario: tipoUsuario },
+                success: function(response) {
+                    $('#usuario').empty();
+                    $.each(response, function(index, usuario) {
+                        $('#usuario').append('<option value="' + usuario + '">' + usuario + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>
