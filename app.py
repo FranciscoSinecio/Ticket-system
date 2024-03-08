@@ -289,6 +289,15 @@ def consultaJefeTicket():
     except Exception as e:
         return f"Error: {str(e)}"
     
+@app.route('/reportes')
+def reportes():
+    
+    return render_template('reportes_jefe.html')
+
+@app.route('/elminar_ticket/<ticket_id>',methods = ['POST'])
+def eliminar_ticket(ticket_id):
+
+    if 
     
 if __name__ =='__main__':
     app.run(debug = True, )
