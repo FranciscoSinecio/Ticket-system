@@ -68,6 +68,7 @@
           <th>Cancelar</th>
           <th>Borrar</th>
           <th>Actualizar</th>
+          <th>Comentarios</th>
         </tr>
       </thead>
       <tbody>
@@ -91,6 +92,7 @@
       <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
       <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button></td>
       <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}')">Actualizar</button></td>
+      <td><button class="btn btn-success" onclick="mostrarModalComentarios('{{ ticket[0] }}')">Comentarios</button></td>
     </tr>
   {% endfor %}
 
@@ -98,52 +100,57 @@
   </div>
   </div>
 
-  <!-- Botón para enviar comentarios u observaciones -->
-<button id="enviarComentariosBtn" class="btn btn-primary" data-toggle="modal" data-target="#comentariosModal">Enviar Comentarios u Observaciones</button>
+<!-- Enlace para abrir el modal -->
+<a href="#comentariosModal" data-toggle="modal"></a>
 
-  
-  <!-- Modal para comentarios u observaciones -->
-  <div class="modal fade" id="comentariosModal" tabindex="-1" role="dialog" aria-labelledby="comentariosModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="comentariosModalLabel">Enviar Comentarios u Observaciones</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-            <span aria-hidden="true">&times;</span>
-          </button>
+<!-- Modal para comentarios u observaciones -->
+<div class="modal fade" id="comentariosModal" tabindex="-1" role="dialog" aria-labelledby="comentariosModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="comentariosModalLabel">Enviar Comentarios</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="tipoUsuario">Seleccione el tipo de usuario:</label>
+            <select class="form-control" id="tipoUsuario">
+              <option value="cliente">Cliente</option>
+              <option value="auxiliar">Auxiliar</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="ticket">Seleccione o ingrese el número de ticket:</label>
+            <select class="form-control" id="ticket" onchange="checkOption(this)">
+                <option value="">Seleccionar</option>
+                <option value="ticket1">Ticket 1</option>
+                <option value="ticket2">Ticket 2</option>
+                <option value="ticket3">Ticket 3</option>
+                <!-- Opción para ingresar manualmente el número de ticket -->
+                <option value="ingresar">Buscar manualmente</option>
+                <!-- Aquí puedes cargar dinámicamente los tickets disponibles -->
+            </select>
+            <input type="text" class="form-control mt-2" id="numeroTicket" placeholder="Ingresar número de ticket" style="display:none;">
         </div>
-        <div class="modal-body">
-          <form>
-            <div class="form-group">
-              <label for="tipoUsuario">Seleccione el tipo de usuario:</label>
-              <select class="form-control" id="tipoUsuario">
-                <option value="cliente">Cliente</option>
-                <option value="auxiliar">Auxiliar</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="usuario">Seleccione el usuario:</label>
-              <select class="form-control" id="usuario">
-                <!-- Aquí se cargarán dinámicamente los usuarios disponibles según el tipo seleccionado -->
-                <!-- Para este ejemplo, dejaremos estático -->
-                <option value="usuario1">Usuario 1</option>
-                <option value="usuario2">Usuario 2</option>
-                <option value="usuario3">Usuario 3</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="comentarios">Comentarios u Observaciones:</label>
-              <textarea class="form-control" id="comentarios" rows="3"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-          <button type="button" class="btn btn-primary" onclick="enviarComentarios()">Enviar</button>
-        </div>
+
+          <div class="form-group">
+            <label for="comentarios">Comentarios/Observaciones:</label>
+            <textarea class="form-control" id="comentarios" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="enviarComentarios()">Enviar</button>
       </div>
     </div>
   </div>
+</div>
+
 
   <footer class="footer">
     <div class="row">
@@ -161,8 +168,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <!-- Script personalizado -->
+
   <script>
-    
     function confirmarCancelar(ticketId) {
       if (confirm('¿Seguro desea cancelar el ticket?')) {
         // Enviar una solicitud AJAX al servidor para cancelar el ticket
@@ -213,29 +220,35 @@
       // Aquí puedes enviar una solicitud AJAX al servidor para asignar el auxiliar al ticket
       console.log(`Ticket ${ticketId} asignado a auxiliar ${auxiliarId}`);
     }
-
-    function enviarComentarios() {
-    const tipoUsuario = document.getElementById('tipoUsuario').value;
-    const usuario = document.getElementById('usuario').value;
-    const comentarios = document.getElementById('comentarios').value;
-
-    // Aquí puedes enviar los comentarios a través de una solicitud AJAX al servidor
-    console.log('Tipo de usuario:', tipoUsuario);
-    console.log('Usuario seleccionado:', usuario);
-    console.log('Comentarios u observaciones:', comentarios);
-
-    // Verificar si la función está llegando aquí
-    console.log('Ejecutando enviarComentarios()');
-
-    // Cerrar el modal después de enviar los comentarios
-    $('#comentariosModal').modal('hide');
-  }
   </script>
+
+  <script>
+    function mostrarModalComentarios(ticketId) {
+      // Muestra el modal de comentarios
+      $('#comentariosModal').modal('show');
+      // Aquí puedes realizar acciones adicionales si es necesario, como cargar los comentarios del ticket seleccionado, etc.
+    }
+  </script>
+
+  <script>
+    function checkOption(select) {
+        var option = select.value;
+        var numeroTicketInput = document.getElementById('numeroTicket');
+
+        if (option === 'ingresar') {
+            numeroTicketInput.style.display = 'block';
+        } else {
+            numeroTicketInput.style.display = 'none';
+        }
+    }
+  </script>
+
    <script>
     function actualizarTicket(ticketId) {
       // Aquí puedes escribir el código para manejar la acción de actualización del ticket
       console.log('Actualizando ticket:', ticketId);
     }
   </script>
+
 </body>
 </html>
