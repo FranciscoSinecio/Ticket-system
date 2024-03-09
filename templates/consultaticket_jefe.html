@@ -82,16 +82,23 @@
       <td>{{ ticket[6] }}</td> <!-- Descripción del problema -->
       <td>{{ ticket[7] }}</td> <!-- Status -->
       <td>
-        <select class="form-control" onchange="assignAuxiliar(this.value, '{{ ticket[0] }}')">
+        <!--<select class="form-control" onchange="assignAuxiliar(this.value, '{{ ticket[0] }}')">
           <option value="">Seleccionar Auxiliar</option>
           {% for a in auxiliar %}
-          <option value="{{ a[0] }}}"> {{ a[0] }} {{ a[1] }}</option>
+          <option value="{{ a[0] }}"> {{ a[0] }}-{{ a[1] }} {{ a[2] }}</option>
           {% endfor %}
-        </select>
+        </select>-->
+        <select id="selectAuxiliar_{{ ticket[0] }}" class="form-control">
+          <option value="">Seleccionar Auxiliar</option>
+          {% for a in auxiliar %}
+          <option value="{{ a[0] }}}"> {{ a[0] }}-{{ a[1] }} {{ a[2] }}</option>
+          {% endfor %}
+      </select>
+
       </td>
       <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
       <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button></td>
-      <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}')">Actualizar</button></td>
+      <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}','{{ticket[7] }} ')">Actualizar</button></td>
       <td><button class="btn btn-success" onclick="mostrarModalComentarios('{{ ticket[0] }}')">Comentarios</button></td>
     </tr>
   {% endfor %}
@@ -243,11 +250,44 @@
     }
   </script>
 
-   <script>
-    function actualizarTicket(ticketId) {
-      // Aquí puedes escribir el código para manejar la acción de actualización del ticket
-      console.log('Actualizando ticket:', ticketId);
-    }
-  </script>
+
+<script>
+  function actualizarTicket(ticketId, status) {
+      var selectElement = document.getElementById('selectAuxiliar_' + ticketId);
+      var selectedAuxiliar = selectElement ? selectElement.value : null;
+
+      if (!selectedAuxiliar) {
+          alert('Por favor, seleccione un auxiliar para asignar el ticket');
+          return;
+      }
+
+      // Información a enviar al backend
+      var data = {
+          ticketId: ticketId,
+          auxiliar: selectedAuxiliar,
+          status: 'asignado'
+      };
+
+      // Enviamos la solicitud AJAX al backend
+      fetch('/actualizar_ticket', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+      })
+      .then(response => {
+          if (response.ok) {
+              alert('Ticket actualizado exitosamente');
+              window.location.reload(); // Recargar la página después de la actualización
+          } else {
+              alert('Hubo un error al actualizar el ticket.');
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+</script>
+
+
 </body>
 </html>

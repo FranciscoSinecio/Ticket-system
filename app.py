@@ -285,7 +285,7 @@ def consultaJefeTicket():
 
         #realizamos la consulta para obtner a los auxiliares
         cur = mysql.connection.cursor()
-        cur.execute("SELECT nombre, apellido_paterno FROM cliente WHERE rol = 'auxiliar'")
+        cur.execute("SELECT idCliente, nombre, apellido_paterno FROM cliente WHERE rol = 'auxiliar'")
         auxiliar = cur.fetchall()
         cur.close()
         print (f'Esto se envia al front de auxiliares {auxiliar}')
@@ -324,6 +324,25 @@ def eliminar_ticket(ticket_id):
             return jsonify({'error': f"Error al eliminar el ticket: {str(e)}"}), 500
     else:
         return jsonify({'error': 'Método no permitido'}), 405
+    
+from flask import jsonify
+
+@app.route('/actualizar_ticket', methods=['POST'])
+def actualizar_ticket():
+    data = request.json
+
+    # Obtenemos los datos del JSON
+    ticket_id = data.get('ticketId')
+    auxiliar = data.get('auxiliar')
+    status = data.get('status')
+    print(f'Estos son los datos obtenidos ---> {ticket_id} ----> {auxiliar} ----> {status}')
+
+    # Realizar cualquier operación necesaria con los datos
+
+    # Devolver una respuesta JSON indicando el éxito de la operación
+    response = {'message': 'Ticket actualizado exitosamente'}
+    return jsonify(response), 200
+
     
 if __name__ =='__main__':
     app.run(debug = True, )
