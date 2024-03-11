@@ -293,36 +293,7 @@
       .catch(error => console.error('Error:', error));
   }
 </script>
-<script>
-  function enviarComentario(){
-    var tipoUsuario = document.getElementById('tipoUsuario').value;
-    var numeroTicket = document.getElementById('ticket').value;
-    var comentarios = document.getElementById('comentarios').value;
 
-    var data ={
-      tipoUsuario: tipoUsuario,
-      numeroTicket: numeroTicket,
-      comentarios: comentrios
-    };
-
-  fetch('/enviar_comentarios', {
-    method: 'POST',
-    headers:{
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
-  .then(response =>{
-    if (response.ok){
-      alert('Comentarios enviados existosamente');
-    }else{
-      alert('Hubo un error al enviar los comentarios.');
-    }
-
-  })
-  .cathc(error => console.error('Error', error));
-  }
-</script>
 
 
 </body>

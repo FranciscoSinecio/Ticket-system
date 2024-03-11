@@ -348,6 +348,9 @@ def actualizar_ticket():
     response = {'message': 'Ticket actualizado exitosamente'}
     return jsonify(response), 200
 
+@app.route('/comentarios')
+def comentarios():
+    
 
 
 
