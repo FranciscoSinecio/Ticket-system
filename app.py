@@ -340,13 +340,16 @@ def actualizar_ticket():
     #obtenidos los datos paso a llenar la base de datos
     cur = mysql.connection.cursor()
     cur.execute("UPDATE tickets SET idAuxiliar =%s, status =%s WHERE id_ticket=%s", (id_auxiliar,status,ticket_id))
-    mysql.connection.close()
+    mysql.connection.commit()
+    cur.close()
 
 
     # Devolvemos el mensaje de actualizacion con Json
     response = {'message': 'Ticket actualizado exitosamente'}
     return jsonify(response), 200
 
-    
+
+
+
 if __name__ =='__main__':
     app.run(debug = True, )
