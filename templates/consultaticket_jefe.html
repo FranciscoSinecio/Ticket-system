@@ -81,7 +81,7 @@
       <td>{{ ticket[5] }}</td> <!-- Problema -->
       <td>{{ ticket[6] }}</td> <!-- Descripción del problema -->
       <td>{{ ticket[7] }}</td> <!-- Status -->
-      <td>
+
         {% if ticket[7] == 'cancelado' %}
 
         <button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button>
