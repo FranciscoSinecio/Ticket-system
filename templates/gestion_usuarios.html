@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Usuarios</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="static/style9.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-link btn-lg" onclick="goBack()">
+          <i class="fas fa-arrow-left"></i> Regresar
+        </button>
+      </div>
+      <div class="col text-center">
+        <h1>Gestión de Usuarios</h1>
+      </div>
+      <div class="col">
+        <!-- elementos al encabezado  -->
+      </div>
+    </div>
+  </header>
+
+  <nav class="navbar navbar-custom">
+    <div></div>
+    <div class="nav-btns">
+      <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Consultar Tickets</a>
+      <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
+      <a id="departamentosBtn" class="btn btn-outline-success" href="/departamentos"><i class="fas fa-building"></i> Departamentos</a>
+      <a id="gestionUsuariosBtn" class="btn btn-outline-danger" href="/gestion_usuarios"><i class="fas fa-users"></i> Gestión de Usuarios</a>
+    </div>
+  </nav>
+  
+
+  <div class="container-parent mt-4">
+    <div class="container">
+
+       <!-- Barra de búsqueda -->
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" placeholder="Buscar usuario..." id="busqueda">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" onclick="buscarUsuario()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Botón para crear nuevo usuario -->
+    <button class="btn btn-success mb-3" onclick="mostrarFormularioCrearUsuario(null)">
+      <i class="fas fa-plus"></i> Crear Nuevo Usuario
+    </button>
+
+        <!-- Lista de usuarios -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nombre de Usuario</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>ID</th>
+              <th>Departamento</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="listaUsuarios">
+
+            <!-- Ejemplo de datos -->
+            <tr>
+              <td>JuanPerez</td>
+              <td>juanperez@example.com</td>
+              <td>123456789</td>
+              <td>001</td>
+              <td>Desarrollo Web</td>
+              <td>
+                <button class="btn btn-primary" onclick="editarUsuario('JuanPerez', 'juanperez@example.com', '123456789', '001', 'Desarrollo Web')">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="btn btn-danger" onclick="eliminarUsuario('JuanPerez')">
+                  <i class="fas fa-trash-alt"></i> Borrar
+                </button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>MariaGonzalez</td>
+              <td>mariagonzalez@example.com</td>
+              <td>987654321</td>
+              <td>002</td>
+              <td>Soporte Técnico</td>
+              <td>
+                <button class="btn btn-primary" onclick="editarUsuario('MariaGonzalez', 'mariagonzalez@example.com', '987654321', '002', 'Soporte Técnico')">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="btn btn-danger" onclick="eliminarUsuario('MariaGonzalez')">
+                  <i class="fas fa-trash-alt"></i> Borrar
+                </button>
+              </td>
+            </tr>
+            <!-- Fin del ejemplo de datos -->
+
+          </tbody>
+        </table>
+      </div>
+  </div>
+
+  
+
+  <!-- Formulario para crear/editar usuario -->
+  <div class="modal fade" id="formularioUsuario" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formUsuario">
+            <div class="form-group">
+              <label for="nombreUsuario">Nombre de Usuario</label>
+              <input type="text" class="form-control" id="nombreUsuario" placeholder="Nombre de Usuario">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input type="tel" class="form-control" id="telefono" placeholder="Teléfono">
+            </div>
+            <div class="form-group">
+              <label for="id">ID</label>
+              <input type="text" class="form-control" id="id" placeholder="ID">
+            </div>
+            <div class="form-group">
+              <label for="departamento">Departamento</label>
+              <select class="form-control" id="departamento">
+                <option>Desarrollo Web</option>
+                <option>Soporte Técnico</option>
+                <option>Marketing</option>
+                <option>Recursos Humanos</option>
+                <option>Ventas</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="row">
+      <div class="col-md-6 text-left">
+        <p>© 2024 - Todos los derechos reservados</p>
+      </div>
+      <div class="col-md-6 text-right">
+        <p>ENGINEERING <span class="resaltado">YOUR</span> SUCCESS.</p>
+      </div>
+    </div>
+  </footer>
+  
+
+  <!-- Bootstrap JS (jQuery debe incluirse antes) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Script personalizado -->
+  <script>
+  // Función para mostrar el formulario de crear o editar usuario
+  function mostrarFormularioCrearUsuario(usuario) {
+    if (usuario) {
+      // Editar usuario
+      $('#nombreUsuario').val(usuario.nombreUsuario);
+      $('#email').val(usuario.email);
+      $('#telefono').val(usuario.telefono);
+      $('#id').val(usuario.id);
+      $('#departamento').val(usuario.departamento);
+      $('#formularioUsuario .modal-title').text('Editar Usuario');
+    } else {
+      // Crear nuevo usuario
+      $('#nombreUsuario').val('');
+      $('#email').val('');
+      $('#telefono').val('');
+      $('#id').val('');
+      $('#departamento').val('');
+      $('#formularioUsuario .modal-title').text('Crear Nuevo Usuario');
+    }
+
+    // Mostrar el formulario
+    $('#formularioUsuario').modal('show');
+  }
+
+  // Función para guardar o editar el usuario
+  function guardarUsuario() {
+    var nombreUsuario = $('#nombreUsuario').val();
+    var email = $('#email').val();
+    var telefono = $('#telefono').val();
+    var id = $('#id').val();
+    var departamento = $('#departamento').val();
+
+    if (nombreUsuario && email && telefono && id && departamento) {
+      // Aquí puedes enviar una solicitud AJAX al servidor para guardar el usuario
+      $('#formularioUsuario').modal('hide');
+      actualizarListaUsuarios();
+    } else {
+      alert('Por favor, complete todos los campos.');
+    }
+  }
+
+  // Función para buscar un usuario
+  function buscarUsuario() {
+    var busqueda = $('#busqueda').val().toLowerCase();
+
+    // Recorrer cada fila de la tabla de usuarios
+    $('#listaUsuarios tr').each(function() {
+      var nombreUsuario = $(this).find('td:nth-child(1)').text().toLowerCase();
+      var email = $(this).find('td:nth-child(2)').text().toLowerCase();
+      var telefono = $(this).find('td:nth-child(3)').text().toLowerCase();
+      var id = $(this).find('td:nth-child(4)').text().toLowerCase();
+      var departamento = $(this).find('td:nth-child(5)').text().toLowerCase();
+
+      // Verificar si el término de búsqueda coincide con algún campo del usuario
+      if (nombreUsuario.includes(busqueda) || email.includes(busqueda) || telefono.includes(busqueda) || id.includes(busqueda) || departamento.includes(busqueda)) {
+        // Mostrar la fila si coincide
+        $(this).show();
+      } else {
+        // Ocultar la fila si no coincide
+        $(this).hide();
+      }
+    });
+  }
+
+  // Función para editar un usuario
+  function editarUsuario(nombreUsuario, email, telefono, id, departamento) {
+    var usuario = { nombreUsuario: nombreUsuario, email: email, telefono: telefono, id: id, departamento: departamento };
+    mostrarFormularioCrearUsuario(usuario);
+  }
+
+  // Función para eliminar un usuario
+  function eliminarUsuario(nombreUsuario) {
+    // Mostrar mensaje de confirmación
+    Swal.fire({
+      title: '¿Estás seguro de eliminar el usuario?',
+      text: '¡No podrás revertir esto!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminarlo!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Aquí puedes enviar una solicitud AJAX al servidor para eliminar el usuario
+        // Después de eliminar, mostrar el mensaje de éxito
+        // Simulando una eliminación exitosa
+        // Aquí deberías reemplazar este código con la lógica real de eliminación
+        setTimeout(function() {
+          // Lógica para eliminar el usuario
+          // Una vez eliminado el usuario, puedes mostrar el Toast de SweetAlert
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer);
+              toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+          });
+          Toast.fire({
+            icon: 'success',
+            title: 'Usuario eliminado exitosamente'
+          });
+
+          // Después de mostrar el Toast, puedes actualizar la lista de usuarios si es necesario
+          actualizarListaUsuarios();
+        }, 1000); // Simulando un retardo para la eliminación (1 segundo)
+      }
+    });
+  }
+  </script>
+
+</body>
+</html>
