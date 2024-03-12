@@ -382,6 +382,23 @@ def guardar_departamento():
     mysql.connection.commit()
     cur.close()
 
+@app.route('/actualizar_departamento', methods=['POST'])
+def actualizar_departamento():
+    data = request.get_json()
+    id_departamento = data['idDepartamento']
+    nombre = ['nombre']
+    descripcion = data['descripcion']
+
+    print(f'el id es ->{id_departamento}\n el nombre es ---> {nombre}\n la descripcion es ---> {descripcion}')
+    
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE departamentos SET nombre_departamento = %s, descripcion = %s WHERE idDepartamento = %s", (nombre, descripcion, id_departamento))
+    mysql.connection.commit()
+    cur.close()
+
+    return jsonify({'message': 'Departamento actualizado exitosamente'}), 200
+
+
     return jsonify({'message': 'Departamento guardado exitosamente'}), 200
 if __name__ =='__main__':
     app.run(debug = True, )
