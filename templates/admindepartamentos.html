@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!--checar esto si no funciona-->
+  
 
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="static/style8.css">
@@ -73,71 +75,22 @@
           <tbody id="listaDepartamentos">
 
             <!-- Ejemplo de datos -->
+          {% for d in departamentos%}
             <tr>
-              <td>Desarrollo Web</td>
-              <td>Equipo encargado del desarrollo y mantenimiento de sitios web.</td>
-              <td>
-                <button class="btn btn-primary" onclick="editarDepartamento('Desarrollo Web', 'Equipo encargado del desarrollo y mantenimiento de sitios web.')">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="eliminarDepartamento('Desarrollo Web')">
-                  <i class="fas fa-trash-alt"></i> Borrar
-                </button>
-              </td>
+
+                <td>{{ d[1] }}</td>
+                <td>{{ d[2] }} </td>
+                <td>
+                  <button class="btn btn-primary" onclick="editarDepartamento('Desarrollo Web', 'Equipo encargado del desarrollo y mantenimiento de sitios web.')">
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  <button class="btn btn-danger" onclick="eliminarDepartamento('Desarrollo Web')">
+                    <i class="fas fa-trash-alt"></i> Borrar
+                  </button>
+                </td>
+
             </tr>
-            
-            <tr>
-              <td>Soporte Técnico</td>
-              <td>Equipo encargado de brindar soporte técnico a los usuarios.</td>
-              <td>
-                <button class="btn btn-primary" onclick="editarDepartamento('Soporte Técnico', 'Equipo encargado de brindar soporte técnico a los usuarios.')">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="eliminarDepartamento('Soporte Técnico')">
-                  <i class="fas fa-trash-alt"></i> Borrar
-                </button>
-              </td>
-            </tr>
-            
-            <tr>
-              <td>Marketing</td>
-              <td>Equipo encargado de las estrategias de marketing y publicidad.</td>
-              <td>
-                <button class="btn btn-primary" onclick="editarDepartamento('Marketing', 'Equipo encargado de las estrategias de marketing y publicidad.')">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="eliminarDepartamento('Marketing')">
-                  <i class="fas fa-trash-alt"></i> Borrar
-                </button>
-              </td>
-            </tr>
-            
-            <tr>
-              <td>Recursos Humanos</td>
-              <td>Equipo encargado de la gestión del talento humano en la empresa.</td>
-              <td>
-                <button class="btn btn-primary" onclick="editarDepartamento('Recursos Humanos', 'Equipo encargado de la gestión del talento humano en la empresa.')">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="eliminarDepartamento('Recursos Humanos')">
-                  <i class="fas fa-trash-alt"></i> Borrar
-                </button>
-              </td>
-            </tr>
-            
-            <tr>
-              <td>Ventas</td>
-              <td>Equipo encargado de las ventas de productos y servicios.</td>
-              <td>
-                <button class="btn btn-primary" onclick="editarDepartamento('Ventas', 'Equipo encargado de las ventas de productos y servicios.')">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="eliminarDepartamento('Ventas')">
-                  <i class="fas fa-trash-alt"></i> Borrar
-                </button>
-              </td>
-            </tr>            
-            <!-- Fin del ejemplo de datos -->
+          {% endfor %}
 
           </tbody>
         </table>
@@ -192,6 +145,8 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  
   <!-- Script personalizado -->
   <script>
   // Función para mostrar el formulario de crear o editar departamento
@@ -218,13 +173,32 @@
     var descripcion = $('#descripcion').val();
 
     if (nombre && descripcion) {
-      // Aquí puedes enviar una solicitud AJAX al servidor para guardar el departamento
-      $('#formularioDepartamento').modal('hide');
-      actualizarListaDepartamentos();
+        var departamento ={
+            nombre: nombre,
+            descripcion: descripcion
+        };
+
+        // Enviamos la solicitud AJAX al backend para guardar el departamento
+        $.ajax({
+            type: 'POST',
+            url: '/guardar_departamento',
+            contentType: 'application/json',
+            data: JSON.stringify(departamento),
+            success: function(response){
+                alert('Departamento guardado exitosamente');
+                // Realizar otras acciones después de guardar el departamento
+            },
+            error : function(error){
+                alert('Hubo un error al guardar el departamento');
+                console.error('Error: ', error);
+            }
+        });
     } else {
-      alert('Por favor, complete todos los campos.');
+        alert('Por favor complete todos los campos.');
     }
-  }
+}
+
+
 
   // Función para buscar un departamento
   function buscarDepartamento() {

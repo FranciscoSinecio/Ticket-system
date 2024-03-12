@@ -348,8 +348,35 @@ def actualizar_ticket():
     response = {'message': 'Ticket actualizado exitosamente'}
     return jsonify(response), 200
 
+@app.route('/comentarios')
+def comentarios():
+    
+    return 'hola'
 
 
+@app.route('/departamentos')
+def departamentos():
+
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM departamentos')
+    departamentos = cur.fetchall()
+    cur.close()
+    print (departamentos)
+
+    return render_template('admindepartamentos.html', departamentos = departamentos)
+
+
+@app.route('/guardar_departamento', methods=['POST'])
+def guardar_departamento():
+    departamento = request.json
+    dpto = departamento.get('nombre')
+    descripcion = departamento.get('descripcion')
+    print(f"""
+    Lo que vamos a tener de informacion van a ser la siguiente:
+        dpto---> {dpto}
+        descripcion ----> {descripcion}""")
+
+    return jsonify({'message': 'Departamento guardado exitosamente'})
 
 if __name__ =='__main__':
     app.run(debug = True, )
