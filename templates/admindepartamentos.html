@@ -81,10 +81,10 @@
                 <td>{{ d[1] }}</td>
                 <td>{{ d[2] }} </td>
                 <td>
-                  <button class="btn btn-primary" onclick="editarDepartamento('Desarrollo Web', 'Equipo encargado del desarrollo y mantenimiento de sitios web.')">
+                  <button class="btn btn-primary" onclick="editarDepartamento('{{ d[0] }} - {{ d[1] }}', '{{ d[2] }}')">
                     <i class="fas fa-edit"></i> Editar
                   </button>
-                  <button class="btn btn-danger" onclick="eliminarDepartamento('Desarrollo Web')">
+                  <button class="btn btn-danger" onclick="eliminarDepartamento('{{ d[1] }}')">
                     <i class="fas fa-trash-alt"></i> Borrar
                   </button>
                 </td>
@@ -142,7 +142,7 @@
   
 
   <!-- Bootstrap JS (jQuery debe incluirse antes) -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> 
+  <!--<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>--> 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   
@@ -152,15 +152,17 @@
   // Función para mostrar el formulario de crear o editar departamento
   function mostrarFormularioCrear(departamento) {
     if (departamento) {
-      // Editar departamento
-      $('#nombre').val(departamento.nombre);
-      $('#descripcion').val(departamento.descripcion);
-      $('#formularioDepartamento .modal-title').text('Editar Departamento');
+        // Editar departamento
+        $('#nombre').val(departamento.nombre);
+        $('#descripcion').val(departamento.descripcion);
+        $('#department_id').val(departamento.idDepartamento);
+        $('#formularioDepartamento .modal-title').text('Editar Departamento');
     } else {
       // Crear nuevo departamento
-      $('#nombre').val('');
-      $('#descripcion').val('');
-      $('#formularioDepartamento .modal-title').text('Crear Nuevo Departamento');
+        $('#nombre').val('');
+        $('#descripcion').val('');
+        $('#department_id').val('');
+        $('#formularioDepartamento .modal-title').text('Crear Nuevo Departamento');
     }
 
     // Mostrar el formulario
@@ -171,12 +173,18 @@
   function guardarDepartamento() {
     var nombre = $('#nombre').val();
     var descripcion = $('#descripcion').val();
+    var department_id = $('#department_id').val(); //Agregado nuevo
 
     if (nombre && descripcion) {
         var departamento ={
             nombre: nombre,
             descripcion: descripcion
-        };
+      };
+      
+      if (department_id){
+        departamento.department_id = department_id;
+      }
+
 
         // Enviamos la solicitud AJAX al backend para guardar el departamento
         $.ajax({
@@ -187,6 +195,9 @@
             success: function(response){
                 alert('Departamento guardado exitosamente');
                 // Realizar otras acciones después de guardar el departamento
+                //cerramos el modal y refrescamos la tabla
+                $('#formularioDepartamento').modal('hide');
+                buscarDepartamento();
             },
             error : function(error){
                 alert('Hubo un error al guardar el departamento');
@@ -222,9 +233,12 @@
 
   // Función para editar un departamento
   function editarDepartamento(nombre, descripcion) {
-    var departamento = { nombre: nombre, descripcion: descripcion };
+    var departamento = {
+        nombre: nombre,
+        descripcion: descripcion
+    };
     mostrarFormularioCrear(departamento);
-  }
+}
 
   // Función para eliminar un departamento
   function eliminarDepartamento(nombre) {

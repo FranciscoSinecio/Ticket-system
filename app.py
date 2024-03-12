@@ -368,15 +368,20 @@ def departamentos():
 
 @app.route('/guardar_departamento', methods=['POST'])
 def guardar_departamento():
-    departamento = request.json
-    dpto = departamento.get('nombre')
-    descripcion = departamento.get('descripcion')
-    print(f"""
-    Lo que vamos a tener de informacion van a ser la siguiente:
-        dpto---> {dpto}
-        descripcion ----> {descripcion}""")
+    data = request.get_json()
+    nombre = data['nombre']
+    descripcion = data.get('descripcion','')
+    
+    print(f'nombre -> {nombre} --- descripcion -> {descripcion}')
 
-    return jsonify({'message': 'Departamento guardado exitosamente'})
+    cur = mysql.connection.cursor()
+    add_departamento = ("INSERT INTO departamentos"
+                        "(nombre_departamento, descripcion)"
+                        "VALUES (%s, %s)")
+    cur.execute(add_departamento,(nombre, descripcion))
+    mysql.connection.commit()
+    cur.close()
 
+    return jsonify({'message': 'Departamento guardado exitosamente'}), 200
 if __name__ =='__main__':
     app.run(debug = True, )
