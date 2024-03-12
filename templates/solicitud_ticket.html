@@ -12,6 +12,8 @@
     <!-- Agrega el enlace al conjunto de iconos FontAwesome -->
     <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
     <title>Solicitar Ticket</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
@@ -29,7 +31,6 @@
     
     <!-- Header -->
     <header class="header">
-        <div class="container">
             <div class="row">
                 <div class="col">
                     <button class="btn btn-link" onclick="goBack()">
@@ -43,8 +44,17 @@
                     <!-- Puedes agregar más elementos al encabezado si es necesario -->
                 </div>
             </div>
-        </div>
     </header>
+
+      <!-- nav -->
+      <nav class="navbar navbar-custom">
+        <div></div>
+        <div class="nav-btns">
+        <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+        <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/solicitar_ticket"><i class="fas fa-list-alt"></i> Solicitar Ticket</a>
+        <a id="reportesBtn" class="btn btn-outline-warning" href="/mis_tickets"><i class="fas fa-chart-bar"></i> Mis Tickets</a>
+        </div>
+      </nav>
 
     <!-- Contenido principal -->
     <div class="container mt-5">
@@ -96,6 +106,35 @@
 
     <!-- Tu script personalizado -->
     <script src="{{ url_for('static', filename='solicitud_ticket.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+    // Función para mostrar el mensaje de éxito después de enviar el formulario
+    function mostrarMensajeExito() {
+        const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+        });
+        Toast.fire({
+        icon: "success",
+        title: "¡Ticket enviado exitosamente!"
+        });
+    }
+
+    // Agregar un listener al formulario para mostrar el mensaje de éxito después de enviarlo
+    document.querySelector("form").addEventListener("submit", function(event) {
+        // Muestra el mensaje de éxito
+        mostrarMensajeExito();
+    });
+    </script>
 
 </body>
 
