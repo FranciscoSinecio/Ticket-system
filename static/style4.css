@@ -18,7 +18,7 @@ body {
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
   background-color: rgba(255, 255, 255, 0.9); /* Fondo semitransparente */
   padding: 25px;
@@ -40,7 +40,7 @@ body {
 .footer {
   background-color: #8f94fb; 
   color: #fff;
-  padding: 10px 0;
+  padding: 5px 0;
   text-align: center;
   position: fixed;
   bottom: 0;
@@ -63,14 +63,9 @@ body {
   cursor: pointer;
   transition: background-color 0.3s ease;
   position: absolute;
-  left: 100px; /* Ajustar la posición del botón de regresar hacia la izquierda */
+  left: 30px; /* Ajustar la posición del botón de regresar hacia la izquierda */
   top: 50%;
   transform: translateY(-50%);
-}
-
-.btn-link:hover {
-  background-color: #2980b9; /* Cambia el color al pasar el ratón */
-  text-decoration: none;
 }
 
 .btn-link {
@@ -81,6 +76,12 @@ body {
 
 .btn-link:hover {
   text-decoration: underline;
+}
+
+button.btn-link {
+  padding: 8px 12px;
+  font-size: 14px;
+  margin-right: 20px;
 }
 
 .navbar {

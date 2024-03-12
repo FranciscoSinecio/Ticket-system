@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="static/style4.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 
@@ -29,13 +30,13 @@
       </div>
   </header>
 
-   <!-- nav -->
-   <nav class="navbar navbar-custom">
+  <!-- nav -->
+  <nav class="navbar navbar-custom">
     <div></div>
     <div class="nav-btns">
-      <a id="editProfileBtn" class="btn btn-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
-      <a id="solicitarTicketBtn" class="btn btn-success" href="/solicitar_ticket"><i class="fas fa-ticket-alt"></i> Solicitar Ticket</a>
-      <a id="panelClienteBtn" class="btn btn-info" href="/panel_cliente"><i class="fas fa-list-alt"></i> Mis Tickets</a>
+    <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+    <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/solicitar_ticket"><i class="fas fa-list-alt"></i> Solicitar Ticket</a>
+    <a id="reportesBtn" class="btn btn-outline-warning" href="/mis_tickets"><i class="fas fa-chart-bar"></i> Mis Tickets</a>
     </div>
   </nav>
   
@@ -54,6 +55,7 @@
           <th>Detalle</th>
           <th>Status</th>
           <th>Cancelar</th>
+          <th>Comentarios</th>
         </tr>
       </thead>
       <tbody>
@@ -68,7 +70,13 @@
           <td>{{ elemento.6 }}</td>
           <td>{{ elemento.7 }}</td>
           <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ elemento.0 }}')">Cancelar</button></td>
-        
+          <td>
+            {% if elemento.8 %}
+                <button class="btn btn-info" onclick="mostrarComentarios('{{ elemento.8 }}')">Ver comentarios</button>
+            {% else %}
+                <p>No hay comentarios</p>
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -137,7 +145,16 @@
       window.location.href = '/panel_cliente';
     });
   });
-
   </script>
+
+  <script>
+    function mostrarComentarios(comentarios) {
+      var comentariosTexto = document.getElementById('comentariosTexto');
+      comentariosTexto.innerText = comentarios;
+
+      $('#comentariosModal').modal('show');
+    }
+  </script>
+
 </body>
 </html>

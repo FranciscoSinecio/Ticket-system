@@ -44,3 +44,4 @@ window.addEventListener("scroll", function () {
 function goBack() {
     window.location.href = "/panel_cliente";
 }
+
