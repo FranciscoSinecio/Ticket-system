@@ -81,22 +81,23 @@
       <td>{{ ticket[5] }}</td> <!-- Problema -->
       <td>{{ ticket[6] }}</td> <!-- Descripción del problema -->
       <td>{{ ticket[7] }}</td> <!-- Status -->
-
+      <td>
         {% if ticket[7] == 'cancelado' %}
-
+      
         <button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button>
-        
+      
         {% else %}
-        
-        <select id="selectAuxiliar_{{ ticket[0] }}" class="form-control">
-          <option value="">Seleccionar Auxiliar</option>
-          {% for a in auxiliar %}
-          <option value="{{ a[0] }}"> {{ a[0] }}-{{ a[1] }} {{ a[2] }}</option>
-          {% endfor %}
-      </select>
-      {% endif %}
+          
+          <select id="selectAuxiliar_{{ ticket[0] }}" class="form-control">
+            <option value="">Seleccionar Auxiliar</option>
+            {% for a in auxiliar %}
+            <option value="{{ a[0] }}"> {{ a[0] }}-{{ a[1] }} {{ a[2] }}</option>
+            {% endfor %}
+          </select>
 
-      </td>
+        {% endif %}
+      </td>    
+      
       <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
       <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button></td>
       <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}','{{ticket[7] }} ')">Actualizar</button></td>
@@ -111,54 +112,56 @@
 <!-- Enlace para abrir el modal -->
 <a href="#comentariosModal" data-toggle="modal"></a>
 
-<!-- Modal para comentarios u observaciones -->
-<div class="modal fade" id="comentariosModal" tabindex="-1" role="dialog" aria-labelledby="comentariosModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="comentariosModalLabel">Enviar Comentarios</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="tipoUsuario">Seleccione el tipo de usuario:</label>
-            <select class="form-control" id="tipoUsuario">
-              <option value="cliente">Cliente</option>
-              <option value="auxiliar">Auxiliar</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="ticket">Seleccione o ingrese el número de ticket:</label>
-            <select class="form-control" id="ticket" onchange="checkOption(this)">
-                <option value="">Seleccionar</option>
-                <option value="ticket1">Ticket 1</option>
-                <option value="ticket2">Ticket 2</option>
-                <option value="ticket3">Ticket 3</option>
-                <!-- Opción para ingresar manualmente el número de ticket -->
-                <option value="ingresar">Buscar manualmente</option>
-                <!-- Aquí puedes cargar dinámicamente los tickets disponibles -->
-            </select>
-            <input type="text" class="form-control mt-2" id="numeroTicket" placeholder="Ingresar número de ticket" style="display:none;">
+  <!-- Modal para comentarios u observaciones -->
+  <div class="modal fade" id="comentariosModal" tabindex="-1" role="dialog" aria-labelledby="comentariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="comentariosModalLabel">Enviar Comentarios</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <!-- Un solo formulario que contiene todos los campos -->
+          <form id="form-comentarios">
+            <div class="form-group">
+              <label for="tipoUsuario">Seleccione el tipo de usuario:</label>
+              <select class="form-control" id="tipoUsuario">
+                <option value="cliente">Cliente</option>
+                <option value="auxiliar">Auxiliar</option>
+              </select>
+            </div>
 
-          <div class="form-group">
-            <label for="comentarios">Comentarios/Observaciones:</label>
-            <textarea class="form-control" id="comentarios" rows="3"></textarea>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" onclick="enviarComentarios()">Enviar</button>
+            <div class="form-group">
+              <label for="ticket">Seleccione o ingrese el número de ticket:</label>
+              <select class="form-control" id="ticket" onchange="checkOption(this)">
+                  <option value="">Seleccionar</option>
+                  <option value="ticket1">Ticket 1</option>
+                  <option value="ticket2">Ticket 2</option>
+                  <option value="ticket3">Ticket 3</option>
+                  <!-- Opción para ingresar manualmente el número de ticket -->
+                  <option value="ingresar">Buscar manualmente</option>
+                  <!-- Aquí puedes cargar dinámicamente los tickets disponibles -->
+              </select>
+              <input type="text" class="form-control mt-2" id="numeroTicket" placeholder="Ingresar número de ticket" style="display:none;">
+              <input type="hidden" id="id_ticket" name="id_ticket" value="">
+            </div>
+
+            <!-- Campo para ingresar comentarios -->
+            <div class="form-group">
+              <label for="comentarios">Comentarios/Observaciones:</label>
+              <textarea class="form-control" id="comentarios" name="comentarios" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="enviarComentarios()">Enviar</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 
   <footer class="footer">
     <div class="row">
@@ -292,9 +295,48 @@
       })
       .catch(error => console.error('Error:', error));
   }
+
+  function enviarComentarios() {
+    // Obtener el número de ticket seleccionado o ingresado manualmente
+    var ticket = document.getElementById('ticket').value;
+    if (ticket === 'ingresar') {
+        ticket = document.getElementById('numeroTicket').value;
+    }
+
+    // Obtener los comentarios
+    var comentarios = document.getElementById('comentarios').value;
+
+    // Crear un objeto con los datos a enviar al servidor
+    var datos = {
+        id_ticket: ticket,
+        comentarios: comentarios
+    };
+
+    // Enviar los datos al servidor mediante AJAX
+    fetch('/comentarios', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => {
+        if (response.ok) {
+            // Los comentarios se enviaron correctamente
+            alert('Comentarios enviados correctamente');
+            // Recargar la página para ver los cambios
+            window.location.reload();
+        } else {
+            // Error al enviar los comentarios
+            alert('Error al enviar los comentarios. Por favor, inténtalo de nuevo.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error al enviar los comentarios. Por favor, verifica tu conexión o inténtalo de nuevo más tarde.');
+    });
+  }
 </script>
-
-
 
 </body>
 </html>
