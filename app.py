@@ -389,15 +389,37 @@ def departamentos():
 
 @app.route('/guardar_departamento', methods=['POST'])
 def guardar_departamento():
-    departamento = request.json
-    dpto = departamento.get('nombre')
-    descripcion = departamento.get('descripcion')
-    print(f"""
-    Lo que vamos a tener de informacion van a ser la siguiente:
-        dpto---> {dpto}
-        descripcion ----> {descripcion}""")
+    data = request.get_json()
+    nombre = data['nombre']
+    descripcion = data.get('descripcion','')
+    
+    print(f'nombre -> {nombre} --- descripcion -> {descripcion}')
 
-    return jsonify({'message': 'Departamento guardado exitosamente'})
+    cur = mysql.connection.cursor()
+    add_departamento = ("INSERT INTO departamentos"
+                        "(nombre_departamento, descripcion)"
+                        "VALUES (%s, %s)")
+    cur.execute(add_departamento,(nombre, descripcion))
+    mysql.connection.commit()
+    cur.close()
 
+@app.route('/actualizar_departamento', methods=['POST'])
+def actualizar_departamento():
+    data = request.get_json()
+    id_departamento = data['idDepartamento']
+    nombre = ['nombre']
+    descripcion = data['descripcion']
+
+    print(f'el id es ->{id_departamento}\n el nombre es ---> {nombre}\n la descripcion es ---> {descripcion}')
+    
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE departamentos SET nombre_departamento = %s, descripcion = %s WHERE idDepartamento = %s", (nombre, descripcion, id_departamento))
+    mysql.connection.commit()
+    cur.close()
+
+    return jsonify({'message': 'Departamento actualizado exitosamente'}), 200
+
+
+    return jsonify({'message': 'Departamento guardado exitosamente'}), 200
 if __name__ =='__main__':
     app.run(debug = True, )

@@ -66,7 +66,6 @@
           <th>Status</th>
           <th>Asignar Auxiliar</th>
           <th>Cancelar</th>
-          <th>Borrar</th>
           <th>Actualizar</th>
           <th>Comentarios</th>
         </tr>
@@ -82,6 +81,7 @@
       <td>{{ ticket[6] }}</td> <!-- Descripción del problema -->
       <td>{{ ticket[7] }}</td> <!-- Status -->
       <td>
+
         {% if ticket[7] == 'cancelado' %}
       
         <button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button>
@@ -99,7 +99,7 @@
       </td>    
       
       <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ ticket[0] }}')">Cancelar</button></td>
-      <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button></td>
+      <!-- <td><button class="btn btn-danger" onclick="confirmarEliminar('{{ ticket[0] }}')"><i class="fas fa-trash-alt"></i></button></td> -->
       <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}','{{ticket[7] }} ')">Actualizar</button></td>
       <td><button class="btn btn-success" onclick="mostrarModalComentarios('{{ ticket[0] }}')">Comentarios</button></td>
     </tr>
