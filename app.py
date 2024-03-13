@@ -205,7 +205,8 @@ def ver_tickets():
             t.fecha_expedicion,
             t.Problema,
             t.Descripcion_problema,
-            t.status
+            t.status,
+            t.Comentarios  
         FROM 
             tickets t
         JOIN 
@@ -221,7 +222,6 @@ def ver_tickets():
     print(f'info enviada al front end {tickets}')
 
     return render_template('mis_tickets.html', tickets=tickets)
-
 
 @app.route('/cancelar_ticket/<int:id_ticket>', methods=['POST'])
 def cancelar_ticket(id_ticket):
