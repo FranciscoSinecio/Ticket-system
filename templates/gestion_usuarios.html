@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="static/style9.css">
@@ -18,7 +19,7 @@
   <header class="header">
     <div class="row">
       <div class="col">
-        <button class="btn btn-link btn-lg" onclick="goBack()">
+        <button class="btn btn-link btn-lg" onclick="window.location.href='{{ url_for('panel_jefe')}}'">
           <i class="fas fa-arrow-left"></i> Regresar
         </button>
       </div>
@@ -75,40 +76,24 @@
           </thead>
           <tbody id="listaUsuarios">
 
-            <!-- Ejemplo de datos -->
+            {% for c in clientes%}
             <tr>
-              <td>JuanPerez</td>
-              <td>juanperez@example.com</td>
-              <td>123456789</td>
-              <td>001</td>
-              <td>Desarrollo Web</td>
+              <td>{{ c[1] }} {{ c[2]}} </td>
+              <td>{{ c[3] }}</td>
+              <td>{{ c[4] }}</td>
+              <td>{{ c[0] }}</td>
+              <td>{{ c[5] }}</td>
               <td>
-                <button class="btn btn-primary" onclick="editarUsuario('JuanPerez', 'juanperez@example.com', '123456789', '001', 'Desarrollo Web')">
+                <button class="btn btn-primary" onclick="editarUsuario('{{ c[0] }}','{{ c[1] }}','{{ c[2]}}')">
                   <i class="fas fa-edit"></i> Editar
                 </button>
-                <button class="btn btn-danger" onclick="eliminarUsuario('JuanPerez')">
+                <button class="btn btn-danger" onclick="eliminarUsuario('{{ c[0] }}')">
                   <i class="fas fa-trash-alt"></i> Borrar
                 </button>
               </td>
             </tr>
-            
-            <tr>
-              <td>MariaGonzalez</td>
-              <td>mariagonzalez@example.com</td>
-              <td>987654321</td>
-              <td>002</td>
-              <td>Soporte Técnico</td>
-              <td>
-                <button class="btn btn-primary" onclick="editarUsuario('MariaGonzalez', 'mariagonzalez@example.com', '987654321', '002', 'Soporte Técnico')">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="eliminarUsuario('MariaGonzalez')">
-                  <i class="fas fa-trash-alt"></i> Borrar
-                </button>
-              </td>
-            </tr>
-            <!-- Fin del ejemplo de datos -->
-
+            {% endfor %}
+          
           </tbody>
         </table>
       </div>
@@ -141,17 +126,15 @@
               <input type="tel" class="form-control" id="telefono" placeholder="Teléfono">
             </div>
             <div class="form-group">
-              <label for="id">ID</label>
-              <input type="text" class="form-control" id="id" placeholder="ID">
+              <label for="id">Contraseña</label>
+              <input type="text" class="form-control" id="contrasena" placeholder="Contraseña">
             </div>
             <div class="form-group">
               <label for="departamento">Departamento</label>
               <select class="form-control" id="departamento">
-                <option>Desarrollo Web</option>
-                <option>Soporte Técnico</option>
-                <option>Marketing</option>
-                <option>Recursos Humanos</option>
-                <option>Ventas</option>
+                {% for d in depart %}
+                <option>{{ d[0] }} - {{ d[1] }}</option>
+                {% endfor%}
               </select>
             </div>
           </form>
@@ -175,9 +158,7 @@
     </div>
   </footer>
   
-
   <!-- Bootstrap JS (jQuery debe incluirse antes) -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <!-- Script personalizado -->
@@ -186,18 +167,18 @@
   function mostrarFormularioCrearUsuario(usuario) {
     if (usuario) {
       // Editar usuario
-      $('#nombreUsuario').val(usuario.nombreUsuario);
+      $('#nombreUsuario').val(usuario.nombre);
       $('#email').val(usuario.email);
       $('#telefono').val(usuario.telefono);
-      $('#id').val(usuario.id);
-      $('#departamento').val(usuario.departamento);
+      $('#contrasena').val(usuario.contrasena);
+      $('#departamento').val(usuario.id_departamento);
       $('#formularioUsuario .modal-title').text('Editar Usuario');
     } else {
       // Crear nuevo usuario
       $('#nombreUsuario').val('');
       $('#email').val('');
       $('#telefono').val('');
-      $('#id').val('');
+      $('#contrasena').val('');
       $('#departamento').val('');
       $('#formularioUsuario .modal-title').text('Crear Nuevo Usuario');
     }
@@ -211,17 +192,60 @@
     var nombreUsuario = $('#nombreUsuario').val();
     var email = $('#email').val();
     var telefono = $('#telefono').val();
-    var id = $('#id').val();
-    var departamento = $('#departamento').val();
+    var contrasena = $('#contrasena').val();
+    var idDepartamento = $('#departamento').val();
+    var idUsuario = $('#id').val(); // Nuevo campo para almacenar el ID del usuario en edición
 
-    if (nombreUsuario && email && telefono && id && departamento) {
-      // Aquí puedes enviar una solicitud AJAX al servidor para guardar el usuario
-      $('#formularioUsuario').modal('hide');
-      actualizarListaUsuarios();
-    } else {
-      alert('Por favor, complete todos los campos.');
-    }
+    if (nombreUsuario && email && telefono && contrasena && idDepartamento) {
+        var usuario = {
+            nombre: nombreUsuario,
+            correo: email,
+            telefono: telefono,
+            contrasena: contrasena,
+            id_departamento: idDepartamento
+        };
+
+        if (idUsuario){
+          //si hay un id , estmos editanddo un usuario existente
+          usuario.id = idUsuario;
+          $.ajax({
+            type: 'PUT',
+            url: '/editar_usuario/' + idUsuario,
+            contentType: 'application/json',
+            data: JSON.stringify(usuario),
+            success: function(response){
+              console.log(response);
+              $('#formularioUsuario').modal('hide');
+              actualizarListaUsuarios();
+            },
+            error: function (error){
+              console.error('Error al editar el usuario:', error);
+            }
+
+          });
+        }else{
+          //si no existe un ID, significa que estamos creando un nuevo usuario
+          $.ajax({
+            type:'POST',
+            url:'/registrar_usuario',
+            contentType:'application/json',
+            data: JSON.stringify(usuario),
+            success: function (response){
+              console.log(response);
+              $('#formularioUsuario').modal('hide');
+              actualizarListaUsuarios();
+            },
+            error:function(error){
+              console.error('Error al guardar nuevo usuario', error);
+            }
+          });
+        }
+      } else{
+        alert('Por favor, completa todos los campos.');
+      }
   }
+
+
 
   // Función para buscar un usuario
   function buscarUsuario() {
@@ -247,10 +271,18 @@
   }
 
   // Función para editar un usuario
-  function editarUsuario(nombreUsuario, email, telefono, id, departamento) {
-    var usuario = { nombreUsuario: nombreUsuario, email: email, telefono: telefono, id: id, departamento: departamento };
+  function editarUsuario(nombreUsuario, email, telefono, contrasena, idDepartamento, idUsuario) {
+    var usuario = {
+        nombre: nombreUsuario,
+        correo: email,
+        telefono: telefono,
+        contrasena: contrasena,
+        id_departamento: idDepartamento,
+        id: idUsuario // Pasar el ID del usuario en edición
+    };
     mostrarFormularioCrearUsuario(usuario);
-  }
+}
+
 
   // Función para eliminar un usuario
   function eliminarUsuario(nombreUsuario) {

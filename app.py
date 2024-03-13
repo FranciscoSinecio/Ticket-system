@@ -382,11 +382,14 @@ def guardar_departamento():
     mysql.connection.commit()
     cur.close()
 
+    return jsonify({'message':'Departamento guradado exitosamente'}), 200
+
+
 @app.route('/actualizar_departamento', methods=['POST'])
 def actualizar_departamento():
     data = request.get_json()
     id_departamento = data['idDepartamento']
-    nombre = ['nombre']
+    nombre = data['nombre']  # Fetching the value of 'nombre' from JSON data
     descripcion = data['descripcion']
 
     print(f'el id es ->{id_departamento}\n el nombre es ---> {nombre}\n la descripcion es ---> {descripcion}')
@@ -399,6 +402,130 @@ def actualizar_departamento():
     return jsonify({'message': 'Departamento actualizado exitosamente'}), 200
 
 
-    return jsonify({'message': 'Departamento guardado exitosamente'}), 200
+@app.route('/verificar_clientes/<int:idDepartamento>', methods=['GET'])
+def verificar_clientes(idDepartamento):
+
+
+    try:
+        #Creamos un cursor para ejecutar las consultas
+        cursor = mysql.connection.cursor()
+
+        #consulta de MySQL para contar el numero de lientes relacionados con el departamento 
+        cursor.execute("SELECT COUNT(*) FROM cliente WHERE idDepartamento = %s", (idDepartamento,))
+        result = cursor.fetchone()
+
+        if result is not None:
+            num_clientes = result[0]
+        else:
+            num_clientes = 0
+
+        #cerramos el cursor
+        cursor.close()
+
+        #Mandamos un Json para indicar si existe clientes relacionados o no
+        return jsonify({'clientes_relacionados': num_clientes > 0}), 200
+    
+    except Exception as e:
+        return jsonify({'success': False, 
+                        'error': str(e)}), 500
+
+
+@app.route('/eliminar_departamento/<int:id_departamento>', methods=['DELETE'])
+def eliminar_departamento(id_departamento):
+    try:
+        # Creamos un cursor para ejecutar las consultas
+        cursor = mysql.connection.cursor()
+
+        # Verificamos si existen clientes relacionados con el departamento
+        cursor.execute("SELECT COUNT(*) FROM cliente WHERE idDepartamento = %s", (id_departamento,))
+        num_clientes = cursor.fetchone()[0]
+
+        if num_clientes > 0:
+            return jsonify({'success': False, 'message': 'Existen clientes relacionados con este departamento.'}), 400
+        else:
+            # Si no hay clientes relacionados al departamento procedemos a borrar
+            cursor.execute("DELETE FROM departamentos WHERE idDepartamento = %s", (id_departamento,))
+            mysql.connection.commit()
+
+            # Devolvemos el JSON con éxito
+            return jsonify({'success': True}), 200
+
+    except Exception as e:
+        # En el caso de error, revertimos la transacción y devolvemos un mensaje de error
+        mysql.connection.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+
+@app.route('/gestion_usuarios')
+def gestion_usuarios():
+
+    
+    #Paso1-> crear un cursor para efectuar la consulta
+    cur = mysql.connection.cursor()
+    #Paso2 -> ejecutar la consulta de todos las personas en la tabla clientes
+    cur.execute("""
+            SELECT 
+                c.idCliente,
+                c.nombre,
+                c.apellido_paterno,
+                c.correo_electronico,
+                c.telefono,
+                d.nombre_departamento
+            FROM 
+                cliente c
+            JOIN
+                departamentos d ON c.idDepartamento = d.idDepartamento
+            ORDER BY
+                d.nombre_departamento
+            """)
+    #paso3 -> Guardamos todos los datos obtenidos en una variable
+    clientes = cur.fetchall()
+    #paso4 -> Cierro la consulta 
+    cur.close()
+
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT idDepartamento , nombre_departamento from departamentos")
+    depart = cur.fetchall()
+    cur.close()
+
+    return render_template('gestion_usuarios.html',clientes = clientes, depart = depart)
+
+# Ruta para registrar un nuevo usuario
+@app.route('/registrar_usuario', methods = ['POST'])
+def registrar_usuario():
+    import re
+    datos_usuario = request.json
+    nombre = datos_usuario['nombre']
+    correo = datos_usuario['correo']
+    telefono = datos_usuario['telefono']
+    contrasena = datos_usuario['contrasena']
+    id_departamento = datos_usuario['id_departamento']
+
+    print(f"""Datos enviados al back end son:\n
+        nombre----->{nombre}
+        correo---->{correo}
+        telefono--->{telefono}
+        contrasena--->{contrasena}
+        id_departamento---->{id_departamento}
+        """)
+    nombre_completo = nombre.split()
+    nombre_pila = nombre_completo[0]
+    apellido_pat = nombre_completo[1]
+    apellido_mat = nombre_completo[2]
+
+    numero = re.search(r'\b(\d+)\b', id_departamento).group(1)
+    id_dpto = int(numero)
+    print(f'numero -> {id_dpto}')
+    cursor = mysql.connection.cursor()
+    cursor.execute("INSERT INTO cliente (nombre, apellido_paterno, apellido_materno, correo_electronico, telefono, contrasena, idDepartamento) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    (nombre_pila, apellido_pat,apellido_mat, correo, telefono, contrasena,id_dpto))
+    mysql.connection.commit()
+    cursor.close()
+        
+    return jsonify({"message": "Usuario registrado exitosamente"}), 201
+
+
 if __name__ =='__main__':
     app.run(debug = True, )
