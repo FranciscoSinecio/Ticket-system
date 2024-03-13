@@ -205,7 +205,8 @@ def ver_tickets():
             t.fecha_expedicion,
             t.Problema,
             t.Descripcion_problema,
-            t.status
+            t.status,
+            t.Comentarios  
         FROM 
             tickets t
         JOIN 
@@ -221,7 +222,6 @@ def ver_tickets():
     print(f'info enviada al front end {tickets}')
 
     return render_template('mis_tickets.html', tickets=tickets)
-
 
 @app.route('/cancelar_ticket/<int:id_ticket>', methods=['POST'])
 def cancelar_ticket(id_ticket):
@@ -348,10 +348,31 @@ def actualizar_ticket():
     response = {'message': 'Ticket actualizado exitosamente'}
     return jsonify(response), 200
 
-@app.route('/comentarios')
-def comentarios():
+
     
-    return 'hola'
+@app.route('/comentarios', methods=['POST'])
+def comentarios():
+    if request.method == 'POST':
+        data = request.get_json()
+        comentarios = data['comentarios']
+        id_ticket = data['id_ticket']
+
+        try:
+            # Conectar a la base de datos
+            cur = mysql.connection.cursor()
+
+            # Actualizar el campo de comentarios en la tabla tickets
+            cur.execute("UPDATE tickets SET Comentarios = %s WHERE id_ticket = %s", (comentarios, id_ticket))
+            mysql.connection.commit()
+            cur.close()
+
+            return 'Comentario enviado correctamente'
+
+        except Exception as e:
+            return f"Error al enviar el comentario: {str(e)}"
+
+    else:
+        return 'Método no permitido'
 
 
 @app.route('/departamentos')
