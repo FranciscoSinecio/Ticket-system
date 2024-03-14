@@ -45,7 +45,7 @@
     <div></div>
     <div class="nav-btns">
       <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
-      <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Consultar Tickets</a>
+      <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultaJefeTicket"><i class="fas fa-list-alt"></i> Consultar Tickets</a>
       <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
       <a id="departamentosBtn" class="btn btn-outline-success" href="/departamentos"><i class="fas fa-building"></i> Departamentos</a>
       <a id="gestionUsuariosBtn" class="btn btn-outline-danger" href="/gestion_usuarios"><i class="fas fa-users"></i> Gestión de Usuarios</a>
@@ -54,7 +54,7 @@
 
   <!-- Contenido adicional -->
 
-  <div class="rowe">
+  <div class="row">
     <div class="col">
       <button class="btn btn-primary btn-block mb-2 style3"  onclick="openPopup('Tickets')">
         <i class="fas fa-ticket-alt"></i> <strong>Reporte de Tickets</strong><br>
@@ -83,7 +83,7 @@
     </button>
 
     <!-- Contenido de la ventana emergente -->
-    <button class="btn btn-danger btn-block mt-3" onclick="downloadPDF()">Descargar en PDF</button>
+    <button id="downloadBtn" class="btn btn-danger btn-block mt-3" onclick="downloadPDF()">Descargar en PDF</button>
   </div>
   
   
@@ -102,9 +102,12 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+
   <!-- Script personalizado -->
+
   <script>
-    let isPopupOpen = false; // Variable para rastrear si la ventana emergente está abierta
+   /* let isPopupOpen = false; // Variable para rastrear si la ventana emergente está abierta
   
     function openPopup(reportType) {
       const popup = document.getElementById("popup");
@@ -118,6 +121,89 @@
         popup.classList.remove("show-popup");
         isPopupOpen = false;
       }
+      //Actualizamos el tipo de reporte en el boton de la descarga 
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.dataset.reportType = reportType;
+    }
+
+    function downloadPDF(){
+      //obtnemos el tipo de reporte del botón de la descarga :-)
+
+      const reportType = document.getElementById("downloadBtn").dataset.reportType;
+
+      //hacemos nuestra solicitud ajax al back endo para obtener el pdf 
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','/generar_pdf/' + reportType, true);
+      xhr.responseType = 'blob'; //para el manejo de los datos binarios
+      xhr.onload = function(){
+        if (this.status === 200){
+          //Se crea un enlace y simulamos un clic para la descarga del pdf
+          var blob = new Blob([this.response],{type: 'application/pdf'});
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = reportType + '_reporte.pdf';
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }else{
+          console.error('Error al descargar el PDF');
+          alert('Error al descargar el pdf. por favor inetntarlo de nuevo mas tarde')
+        }
+      };
+      xhr.onerror = function(){
+        console.error('Error de red al descargar el PDF');
+        alert('Error de red al descargar el PDF ')
+      }
+      xhr.send();
+
+    }*/
+    let isPopupOpen = false;
+
+    function openPopup(reportType) {
+      const popup = document.getElementById("popup");
+  
+      if (!isPopupOpen) {
+        popup.classList.add("show-popup");
+        isPopupOpen = true;
+      } else {
+        popup.classList.remove("show-popup");
+        isPopupOpen = false;
+      }
+
+      const downloadBtn = document.getElementById("downloadBtn");
+      downloadBtn.dataset.reportType = reportType;
+    }
+
+    function downloadPDF(){
+      const reportType = document.getElementById("downloadBtn").dataset.reportType;
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET','/generar_pdf/' + reportType, true);
+      xhr.responseType = 'blob';
+      xhr.onload = function(){
+        if (this.status === 200){
+          var blob = new Blob([this.response],{type: 'application/pdf'});
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = reportType + '_reporte.pdf';
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }else{
+          console.error('Error al descargar el PDF');
+          alert('Error al descargar el pdf. por favor inetntarlo de nuevo mas tarde')
+        }
+      };
+      xhr.onerror = function(){
+        console.error('Error de red al descargar el PDF');
+        alert('Error de red al descargar el PDF ')
+      }
+      xhr.send();
     }
   </script>  
   

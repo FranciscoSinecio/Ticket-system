@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response,jsonify
 from flask_mysqldb import MySQL
+from reportlab.lib import colors
 from datetime import datetime
+from io import BytesIO
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.pdfgen import canvas
+
+
 
 
 app = Flask(__name__)
@@ -488,11 +495,14 @@ def gestion_usuarios():
     #Paso2 -> ejecutar la consulta de todos las personas en la tabla clientes
     cur.execute("""
             SELECT 
-                c.idCliente,
+                c.idCliente, 
                 c.nombre,
                 c.apellido_paterno,
+                c.apellido_materno,
                 c.correo_electronico,
                 c.telefono,
+                c.rol,
+                c.contrasena,
                 d.nombre_departamento
             FROM 
                 cliente c
@@ -505,6 +515,8 @@ def gestion_usuarios():
     clientes = cur.fetchall()
     #paso4 -> Cierro la consulta 
     cur.close()
+
+    print(f'datos enviados son: {clientes}')
 
     cur = mysql.connection.cursor()
     cur.execute("SELECT idDepartamento , nombre_departamento from departamentos")
@@ -523,6 +535,7 @@ def registrar_usuario():
     telefono = datos_usuario['telefono']
     contrasena = datos_usuario['contrasena']
     id_departamento = datos_usuario['id_departamento']
+    rol = datos_usuario['rol']
 
     print(f"""Datos enviados al back end son:\n
         nombre----->{nombre}
@@ -530,6 +543,7 @@ def registrar_usuario():
         telefono--->{telefono}
         contrasena--->{contrasena}
         id_departamento---->{id_departamento}
+        rol-----> {rol}
         """)
     nombre_completo = nombre.split()
     nombre_pila = nombre_completo[0]
@@ -540,12 +554,259 @@ def registrar_usuario():
     id_dpto = int(numero)
     print(f'numero -> {id_dpto}')
     cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO cliente (nombre, apellido_paterno, apellido_materno, correo_electronico, telefono, contrasena, idDepartamento) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                    (nombre_pila, apellido_pat,apellido_mat, correo, telefono, contrasena,id_dpto))
+    cursor.execute("INSERT INTO cliente (nombre, apellido_paterno, apellido_materno, correo_electronico, telefono, contrasena, idDepartamento, rol) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (nombre_pila, apellido_pat, apellido_mat, correo, telefono, contrasena, id_dpto, rol))
     mysql.connection.commit()
     cursor.close()
         
     return jsonify({"message": "Usuario registrado exitosamente"}), 201
+
+@app.route('/editar_usuario/<int:id_usuario>', methods=['PUT'])
+def editar_usuario(id_usuario):
+    import re
+    datos_usuario = request.json
+    nombre = datos_usuario['nombre']
+    correo = datos_usuario['correo']
+    telefono = datos_usuario['telefono']
+    contrasena = datos_usuario['contrasena']
+    id_departamento = datos_usuario['id_departamento']
+    rol = datos_usuario['rol']  # Obtener el valor del campo de rol
+
+    print(f"""Datos enviados al back end para editar el usuario con ID {id_usuario} son:\n
+        nombre----->{nombre}
+        correo---->{correo}
+        telefono--->{telefono}
+        contrasena--->{contrasena}
+        id_departamento---->{id_departamento}
+        rol----->{rol}
+        """)
+    nombre_completo = nombre.split()
+    nombre_pila = nombre_completo[0]
+    apellido_pat = nombre_completo[1]
+    apellido_mat = nombre_completo[2]
+
+    numero = re.search(r'\b(\d+)\b', id_departamento).group(1)
+    id_dpto = int(numero)
+    print(f'numero -> {id_dpto}')
+    cursor = mysql.connection.cursor()
+    cursor.execute("UPDATE cliente SET nombre = %s, apellido_paterno = %s, apellido_materno = %s, correo_electronico = %s, telefono = %s, contrasena = %s, idDepartamento = %s, rol = %s WHERE id = %s",
+                    (nombre_pila, apellido_pat, apellido_mat, correo, telefono, contrasena, id_dpto, rol, id_usuario))  # Agregar el campo de rol a la consulta SQL
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({"message": "Usuario editado exitosamente"}), 200
+
+
+@app.route('/eliminar_usuario/<int:idUsuario>', methods=['DELETE'])
+def eliminar_usuario(idUsuario):
+    try:
+        # Conectar a la base de datos
+        cur = mysql.connection.cursor()
+
+        # Eliminar registros relacionados en la tabla 'tickets'
+        cur.execute("DELETE FROM tickets WHERE idCliente = %s", (idUsuario,))
+        mysql.connection.commit()
+
+        # Eliminar el usuario de la tabla 'cliente'
+        cur.execute("DELETE FROM cliente WHERE idCliente = %s", (idUsuario,))
+        mysql.connection.commit()
+
+        cur.close()
+
+        return jsonify({'message': 'Usuario eliminado exitosamente'}), 200
+    except Exception as e:
+        return jsonify({'error': f"Error al eliminar el usuario: {str(e)}"}), 500
+    
+# Ruta para generar el PDF
+@app.route('/generar_pdf/<reportType>')
+def generar_pdf(reportType):
+    # Lógica para generar el contenido del PDF
+    if reportType == "Tickets":
+        # Aquí se genera el contenido del PDF de reporte de tickets
+        generar_pdf_tickets()
+
+        return generar_pdf_tickets()
+    elif reportType == "Auxiliares":
+        # Aquí se genera el contenido del PDF de reporte de auxiliares
+        return generar_pdf_auxiliares()
+    elif reportType == "Departamentos":
+        # Aquí se genera el contenido del PDF de reporte de departamentos
+        return generar_pdf_departamentos()
+    else:
+        return "Tipo de reporte no válido"
+
+# Función para generar el PDF de reporte de tickets
+def generar_pdf_tickets():
+# Generar el contenido del PDF
+    pdf_buffer = BytesIO()
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(letter))
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM tickets")
+    tickets = cur.fetchall()
+
+    tabla_datos = [['ID', 'Problema', 'Descripcion', 'Fecha de expedicion', 'Fecha de termino', 
+                    'Status', 'Id cliente', 'Id auxiliar', 'Comentarios']]
+    
+    for t in tickets:
+        fila = [str(field) for field in t]
+        tabla_datos.append([
+            str(t[0]),
+            t[1],
+            t[2],
+            str(t[3]),
+            str(t[4]),
+            t[5],
+            str(t[6]),
+            str(t[7]),
+            t[8]
+        ])
+    
+    # Obtener ancho de la página y definir ancho de columnas
+    width, height = landscape(letter)
+    column_widths = [width / len(tabla_datos[0])] * len(tabla_datos[0])
+
+    # Crear tabla y aplicar estilos
+    table = Table(tabla_datos, colWidths=column_widths)
+    table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                ('WORDWRAP', (0, 0), (-1, -1), True)]))
+
+    # Construir el PDF y devolverlo como respuesta Flask
+    doc.build([table])
+    response = make_response(pdf_buffer.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=reporte_tickets.pdf'
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
+
+def generar_pdf_auxiliares():
+    try:
+        # Generar el contenido del PDF
+        pdf_buffer = BytesIO()
+        doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(letter))
+        cur = mysql.connection.cursor()
+        
+        # Consultar los auxiliares ordenados por departamento
+        cur.execute("""
+            SELECT idCliente, nombre, apellido_paterno, apellido_materno, correo_electronico, telefono
+            FROM cliente
+            WHERE rol = 'auxiliar'
+            ORDER BY idDepartamento
+        """)
+        auxiliares = cur.fetchall()
+
+        tabla_datos = [['ID', 'Nombre', 'Apellido Paterno', 'Apellido Materno', 'Correo Electrónico', 'Teléfono']]
+        
+        for a in auxiliares:
+            fila = [str(field) for field in a]
+            tabla_datos.append([
+                str(a[0]),
+                a[1],
+                a[2],
+                a[3],
+                a[4],
+                a[5]
+            ])
+        
+        # Obtener ancho de la página y definir ancho de columnas
+        width, height = landscape(letter)
+        column_widths = [width / len(tabla_datos[0])] * len(tabla_datos[0])
+
+        # Crear tabla y aplicar estilos
+        table = Table(tabla_datos, colWidths=column_widths)
+        table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                    ('WORDWRAP', (0, 0), (-1, -1), True)]))
+
+        # Construir el PDF y devolverlo como respuesta Flask
+        doc.build([table])
+        response = make_response(pdf_buffer.getvalue())
+        response.headers['Content-Disposition'] = 'attachment; filename=reporte_auxiliares.pdf'
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+
+    except Exception as e:
+        return f"Error al generar el PDF de auxiliares: {str(e)}"
+
+def generar_pdf_departamentos():
+    try:
+        # Generar el contenido del PDF
+        pdf_buffer = BytesIO()
+        doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(letter))
+        cur = mysql.connection.cursor()
+        
+        # Consultar los tickets ordenados por departamento
+        cur.execute("""
+            SELECT 
+                t.id_ticket,
+                c.nombre,
+                c.apellido_paterno,
+                d.nombre_departamento,
+                t.fecha_expedicion,
+                t.Problema,
+                t.Descripcion_problema,
+                t.status,
+                t.Comentarios  
+            FROM 
+                tickets t
+            JOIN 
+                cliente c ON t.idCliente = c.idCliente
+            JOIN
+                departamentos d ON c.idDepartamento = d.idDepartamento
+            ORDER BY d.nombre_departamento, t.id_ticket DESC
+        """)
+        tickets = cur.fetchall()
+
+        tabla_datos = [['ID Ticket', 'Nombre', 'Apellido', 'Departamento', 'Fecha de expedicion', 
+                        'Problema', 'Descripcion', 'Status', 'Comentarios']]
+        
+        for t in tickets:
+            fila = [str(field) for field in t]
+            tabla_datos.append([
+                str(t[0]),
+                t[1],
+                t[2],
+                t[3],
+                str(t[4]),
+                t[5],
+                t[6],
+                t[7],
+                t[8]
+            ])
+        
+        # Obtener ancho de la página y definir ancho de columnas
+        width, height = landscape(letter)
+        column_widths = [width / len(tabla_datos[0])] * len(tabla_datos[0])
+
+        # Crear tabla y aplicar estilos
+        table = Table(tabla_datos, colWidths=column_widths)
+        table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                    ('WORDWRAP', (0, 0), (-1, -1), True)]))
+
+        # Construir el PDF y devolverlo como respuesta Flask
+        doc.build([table])
+        response = make_response(pdf_buffer.getvalue())
+        response.headers['Content-Disposition'] = 'attachment; filename=reporte_tickets_departamentos.pdf'
+        response.headers['Content-Type'] = 'application/pdf'
+        return response
+
+    except Exception as e:
+        return f"Error al generar el PDF: {str(e)}"
 
 
 if __name__ =='__main__':
