@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response,jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, make_response,jsonify,send_file
+from jinja2 import Environment, FileSystemLoader
 from flask_mysqldb import MySQL
 from reportlab.lib import colors
 from datetime import datetime
@@ -6,6 +7,9 @@ from io import BytesIO
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.pdfgen import canvas
+import os 
+import pdfkit
+
 
 
 
@@ -624,8 +628,8 @@ def generar_pdf(reportType):
     if reportType == "Tickets":
         # Aquí se genera el contenido del PDF de reporte de tickets
         generar_pdf_tickets()
-
-        return generar_pdf_tickets()
+        return send_file('Reporte_tickets.pdf', as_attachment=True)
+    
     elif reportType == "Auxiliares":
         # Aquí se genera el contenido del PDF de reporte de auxiliares
         return generar_pdf_auxiliares()
@@ -637,176 +641,57 @@ def generar_pdf(reportType):
 
 # Función para generar el PDF de reporte de tickets
 def generar_pdf_tickets():
-# Generar el contenido del PDF
-    pdf_buffer = BytesIO()
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(letter))
+
+    #carpetas para la generacion de pdf
+    path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
+    path_to_executable = os.path.join(path_to_wkhtmltopdf, "wkhtmltopdf.exe")
+    config = pdfkit.configuration(wkhtmltopdf=path_to_executable)
+
+    
+    amb = Environment(loader=FileSystemLoader("templates"))
+    #obtenemos la plantilla a utilizar
+    template = amb.get_template("template1_topdf.html")
+    #Obtenemos los datos de la base de datps
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM tickets")
-    tickets = cur.fetchall()
+    cur.execute("""
+                SELECT
+                    t.id_ticket,
+                    t.Problema,
+                    t.Descripcion_problema,
+                    t.fecha_expedicion,
+                    t.fecha_termino,
+                    t.status,
+                    COALESCE(c.nombre, 'N/A') AS nombre_cliente,
+                    COALESCE(a.nombre, 'N/A') AS nombre_auxiliar
+                FROM 
+                    tickets t
+                LEFT JOIN 
+                    cliente c ON t.idCliente = c.idCliente AND c.rol = 'cliente'
+                LEFT JOIN 
+                    cliente a ON t.idAuxiliar = a.idCliente AND a.rol = 'auxiliar'
+                """)
+    # Obtenemos los datos de la consulta
+    data = cur.fetchall()
+    cur.close()
+    #obtenemos la fecha actual
+    fecha_now = datetime.now().date()
+    fecha_formato = fecha_now.strftime("%Y-%m-%d")
+    print(fecha_formato)
+    print (data) #Borrar cuando veas que te ha enviado
+    html = render_template('template1_topdf.html', data = data, fecha_formato=fecha_formato)
+    print (html)
+    pdfkit.from_string(html,'Reporte_tickets.pdf', configuration = config)
 
-    tabla_datos = [['ID', 'Problema', 'Descripcion', 'Fecha de expedicion', 'Fecha de termino', 
-                    'Status', 'Id cliente', 'Id auxiliar', 'Comentarios']]
+
+
+
+
     
-    for t in tickets:
-        fila = [str(field) for field in t]
-        tabla_datos.append([
-            str(t[0]),
-            t[1],
-            t[2],
-            str(t[3]),
-            str(t[4]),
-            t[5],
-            str(t[6]),
-            str(t[7]),
-            t[8]
-        ])
-    
-    # Obtener ancho de la página y definir ancho de columnas
-    width, height = landscape(letter)
-    column_widths = [width / len(tabla_datos[0])] * len(tabla_datos[0])
-
-    # Crear tabla y aplicar estilos
-    table = Table(tabla_datos, colWidths=column_widths)
-    table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                                ('WORDWRAP', (0, 0), (-1, -1), True)]))
-
-    # Construir el PDF y devolverlo como respuesta Flask
-    doc.build([table])
-    response = make_response(pdf_buffer.getvalue())
-    response.headers['Content-Disposition'] = 'attachment; filename=reporte_tickets.pdf'
-    response.headers['Content-Type'] = 'application/pdf'
-    return response
-
 def generar_pdf_auxiliares():
-    try:
-        # Generar el contenido del PDF
-        pdf_buffer = BytesIO()
-        doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(letter))
-        cur = mysql.connection.cursor()
-        
-        # Consultar los auxiliares ordenados por departamento
-        cur.execute("""
-            SELECT idCliente, nombre, apellido_paterno, apellido_materno, correo_electronico, telefono
-            FROM cliente
-            WHERE rol = 'auxiliar'
-            ORDER BY idDepartamento
-        """)
-        auxiliares = cur.fetchall()
-
-        tabla_datos = [['ID', 'Nombre', 'Apellido Paterno', 'Apellido Materno', 'Correo Electrónico', 'Teléfono']]
-        
-        for a in auxiliares:
-            fila = [str(field) for field in a]
-            tabla_datos.append([
-                str(a[0]),
-                a[1],
-                a[2],
-                a[3],
-                a[4],
-                a[5]
-            ])
-        
-        # Obtener ancho de la página y definir ancho de columnas
-        width, height = landscape(letter)
-        column_widths = [width / len(tabla_datos[0])] * len(tabla_datos[0])
-
-        # Crear tabla y aplicar estilos
-        table = Table(tabla_datos, colWidths=column_widths)
-        table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                                    ('WORDWRAP', (0, 0), (-1, -1), True)]))
-
-        # Construir el PDF y devolverlo como respuesta Flask
-        doc.build([table])
-        response = make_response(pdf_buffer.getvalue())
-        response.headers['Content-Disposition'] = 'attachment; filename=reporte_auxiliares.pdf'
-        response.headers['Content-Type'] = 'application/pdf'
-        return response
-
-    except Exception as e:
-        return f"Error al generar el PDF de auxiliares: {str(e)}"
+    pass
 
 def generar_pdf_departamentos():
-    try:
-        # Generar el contenido del PDF
-        pdf_buffer = BytesIO()
-        doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(letter))
-        cur = mysql.connection.cursor()
-        
-        # Consultar los tickets ordenados por departamento
-        cur.execute("""
-            SELECT 
-                t.id_ticket,
-                c.nombre,
-                c.apellido_paterno,
-                d.nombre_departamento,
-                t.fecha_expedicion,
-                t.Problema,
-                t.Descripcion_problema,
-                t.status,
-                t.Comentarios  
-            FROM 
-                tickets t
-            JOIN 
-                cliente c ON t.idCliente = c.idCliente
-            JOIN
-                departamentos d ON c.idDepartamento = d.idDepartamento
-            ORDER BY d.nombre_departamento, t.id_ticket DESC
-        """)
-        tickets = cur.fetchall()
-
-        tabla_datos = [['ID Ticket', 'Nombre', 'Apellido', 'Departamento', 'Fecha de expedicion', 
-                        'Problema', 'Descripcion', 'Status', 'Comentarios']]
-        
-        for t in tickets:
-            fila = [str(field) for field in t]
-            tabla_datos.append([
-                str(t[0]),
-                t[1],
-                t[2],
-                t[3],
-                str(t[4]),
-                t[5],
-                t[6],
-                t[7],
-                t[8]
-            ])
-        
-        # Obtener ancho de la página y definir ancho de columnas
-        width, height = landscape(letter)
-        column_widths = [width / len(tabla_datos[0])] * len(tabla_datos[0])
-
-        # Crear tabla y aplicar estilos
-        table = Table(tabla_datos, colWidths=column_widths)
-        table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                                    ('WORDWRAP', (0, 0), (-1, -1), True)]))
-
-        # Construir el PDF y devolverlo como respuesta Flask
-        doc.build([table])
-        response = make_response(pdf_buffer.getvalue())
-        response.headers['Content-Disposition'] = 'attachment; filename=reporte_tickets_departamentos.pdf'
-        response.headers['Content-Type'] = 'application/pdf'
-        return response
-
-    except Exception as e:
-        return f"Error al generar el PDF: {str(e)}"
+    pass
 
 
 if __name__ =='__main__':
