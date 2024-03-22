@@ -128,13 +128,7 @@ def edit_profile():
         }
 
         return render_template('admincliente.html', datos=datos)
-#------------------------------------------------------------------------------------------------
-@app.route('/pruebas')
-def pruebas():
-    print(url_for('pruebas'))
-    return render_template('pruebas.html')
 
-#-------------------------------------------------------------------------------------------------
 @app.route('/login',methods=["GET","POST"])
 def login():
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and request.form['password']:
@@ -162,6 +156,10 @@ def login():
             if session['rol'] == 'jefe':
                 
                 return redirect(url_for('panel_jefe')) 
+            
+            elif session['rol'] == 'auxiliar':
+
+                return redirect(url_for('panel_auxiliar'))
                 
             else:
                 
@@ -170,6 +168,41 @@ def login():
             error_message = "Usuario o contraseña incorrectos"
             return  render_template('login.html', error_message = error_message)
     return render_template('login.html')
+
+#-------------------------------Cambio de password ------------------------------------------------------------------
+
+@app.route('/change_password', methods=['POST'])
+def change_password():
+    if 'id' in session:
+        user_id = session['id']
+        clave_actual = request.json.get('passwordActual')
+        clave_nueva = request.json.get('passwordNuevo')
+
+        #verificacion en la base de datos del usuario
+
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT contresena FROM cliente WHERE idCliente = %s', (user_id))
+        user=cur.fetchone()
+        cur.close()
+
+        if user:
+            stored_password = user['contrasena']
+            if stored_password == clave_actual:
+
+                cur = mysql.connection.cursor()
+                cur.execute('UPDATE cliente SET contrasena = %s WHERE idCliente = %s', (clave_nueva, user_id))
+                mysql.connection.commit()
+                cur.close()
+                return jsonify({'message': 'La contraseña se ha actualizado satisfactoriamente'}), 200
+            else:
+                return jsonify({'error': 'La contraseña actua es incorrecta'}), 400
+        else:
+            return jsonify({'error': 'Usuario no encontrado.'}), 404
+    else:
+        return jsonify({'error': 'Usuario no autenticado'}), 401
+            
+
+
 
 #-------------------------------------------------------------------------------
 # -> Creación de la vista y la ruta para solicitudes de tickets
@@ -683,9 +716,6 @@ def generar_pdf_tickets():
     pdfkit.from_string(html,'Reporte_tickets.pdf', configuration = config)
 
 
-
-
-
     
 def generar_pdf_auxiliares():
     pass
@@ -693,6 +723,16 @@ def generar_pdf_auxiliares():
 def generar_pdf_departamentos():
     pass
 
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+# -----------------------------------------------------------------------Visstas y urls para auxiliares -------------------------------------------------------------------------------------------------//
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
+
+
+@app.route('/panel_auxiliar')
+def panel_auxiliar():
+    
+    return 'Hola'
+
 
 if __name__ =='__main__':
-    app.run(debug = True, )
+    app.run(debug = True )

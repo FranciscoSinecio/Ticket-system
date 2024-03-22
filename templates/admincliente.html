@@ -158,6 +158,40 @@
 
             <!-- Tu script personalizado -->
             <script src="{{ url_for('static', filename='admincliente.js') }}"></script>
+            
+            <script>
+                function confirmPasswordChange(){
+                    var passwordActual = document.getElementById('current_password').value;
+                    var passwordNuevo = document.getElementById('new_password').value;
+                    var confirmacionPassword = document.getElementById('confirm_new_password').value;
+
+                    if (passwordNuevo != confirmacionPassword){
+                        alert('Error: Las contraseñas nuevas no coinciden');
+                        return;
+                    }
+                    //Enviamos la solicitud ajax hacia el backend
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/change_password', true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.onload = function(){
+                    
+                    if (xhr.status == 200){
+                        alert('¡Contraseña cambiada exitosamente!');
+                        closePasswordModal();
+                    } else {
+                        alert('¡Error!, no se pudo actualizar la contraseña')
+                    }
+                    };
+    
+                    xhr.send(JSON.stringify({passwordActual: passwordActual, passwordNuevo: passwordNuevo}));
+                }
+
+                function closePasswordModal(){
+                    document.getElementById('passwordModal').style.display = 'none';
+                }
+                
+            </script>
 
         {% endblock %}
 
