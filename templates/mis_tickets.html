@@ -69,7 +69,14 @@
           <td>{{ elemento.5 }}</td>
           <td>{{ elemento.6 }}</td>
           <td>{{ elemento.7 }}</td>
-          <td><button class="btn btn-danger" onclick="confirmarCancelar('{{ elemento.0 }}')">Cancelar</button></td>
+          <td>
+            {% if elemento.7 == 'asignado' %}
+              <button class="btn btn-danger" onclick="confirmarCancelar('{{ elemento.0 }}')" disabled>Cancelar</button>
+            {% else %}
+              <button class="btn btn-danger" onclick="confirmarCancelar('{{ elemento.0 }}')">Cancelar</button>
+            {% endif %}
+          </td>
+
           <td>
               {% if elemento.8 %}
                   <button class="btn btn-info" onclick="mostrarComentarios('{{ elemento.8 }}')">Ver comentarios</button>
@@ -143,9 +150,15 @@
     function goBack() {
       window.history.back();
     }
-  </script>
-  <script>
-     document.addEventListener('DOMContentLoaded', function() {
+
+    function mostrarComentarios(comentarios) {
+        var comentariosTexto = document.getElementById('comentariosTexto');
+        comentariosTexto.innerText = comentarios;
+
+        $('#comentariosModal').modal('show'); 
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
     var editProfileBtn = document.getElementById('editProfileBtn');
     var solicitarTicketBtn = document.getElementById('solicitarTicketBtn');
     var panelClienteBtn = document.getElementById('panelClienteBtn');
@@ -165,16 +178,8 @@
       window.location.href = '/panel_cliente';
     });
   });
-  </script>
+</script>
 
-  <script>
-    function mostrarComentarios(comentarios) {
-        var comentariosTexto = document.getElementById('comentariosTexto');
-        comentariosTexto.innerText = comentarios;
-
-        $('#comentariosModal').modal('show'); 
-     }
-  </script>
 
 </body>
 </html>

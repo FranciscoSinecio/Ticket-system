@@ -31,7 +31,7 @@ def dict_factory(cursor,row):
     d ={}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
-        return d
+    return d
 #----------------------------------------------------------------------------------------------------
 @app.before_request
 def configure_row_factory():
@@ -178,30 +178,20 @@ def change_password():
         clave_actual = request.json.get('passwordActual')
         clave_nueva = request.json.get('passwordNuevo')
 
-        #verificacion en la base de datos del usuario
-
         cur = mysql.connection.cursor()
-        cur.execute('SELECT contresena FROM cliente WHERE idCliente = %s', (user_id))
-        user=cur.fetchone()
-        cur.close()
+        cur.execute('SELECT * FROM cliente WHERE idCliente = %s', (user_id,))
+        user = cur.fetchone()
+        print(user)
 
-        if user:
-            stored_password = user['contrasena']
-            if stored_password == clave_actual:
-
-                cur = mysql.connection.cursor()
-                cur.execute('UPDATE cliente SET contrasena = %s WHERE idCliente = %s', (clave_nueva, user_id))
-                mysql.connection.commit()
-                cur.close()
-                return jsonify({'message': 'La contraseña se ha actualizado satisfactoriamente'}), 200
-            else:
-                return jsonify({'error': 'La contraseña actua es incorrecta'}), 400
+        if isinstance(user, tuple) and user[5] == clave_actual:  # Accede a los elementos de la tupla por índice
+            cur.execute('UPDATE cliente SET contrasena = %s WHERE idCliente = %s', (clave_nueva, user_id))
+            mysql.connection.commit()
+            cur.close()
+            return jsonify({'message': 'La contraseña se ha actualizado satisfactoriamente'}), 200
         else:
-            return jsonify({'error': 'Usuario no encontrado.'}), 404
+            return jsonify({'error': 'La contraseña actual es incorrecta'}), 400
     else:
         return jsonify({'error': 'Usuario no autenticado'}), 401
-            
-
 
 
 #-------------------------------------------------------------------------------
