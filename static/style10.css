@@ -1,0 +1,109 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+    overflow-y: hidden; /* Cambiado a hidden para ocultar la barra de desplazamiento vertical */
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(45deg, #4e54c8, #8f94fb);
+    padding-bottom: 50px; /* espacio en la parte inferior igual a la altura del footer */
+    box-sizing: border-box; /* padding y el border en el cálculo del tamaño total */
+}
+
+.gradient-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* z-index: -1; */ /* Comenta o elimina esta línea */
+    animation: gradientAnimation 15s ease infinite;
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.container {
+    max-width: 800px;
+    margin: auto; 
+    padding: 20px; /* espacio entre el contenido y los bordes del contenedor */
+}
+
+.jumbotron {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.card {
+    transition: transform 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333333;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px; /* espacio entre las tarjetas */
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    color: #333333;
+}
+
+.card-text {
+    color: #555555;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-top: 20px;
+}
+
+.float-left {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+}
+
+.organization-container img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+.footer {
+    text-align: center;
+    color: #ffffff;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 0px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+.logout {
+    position: fixed;
+    top: 50px; /* Distancia desde el borde superior */
+    right: 40px; /* Distancia desde el borde derecho */
+    z-index: 999; /* Asegura que esté por encima de otros elementos */
+}
+
