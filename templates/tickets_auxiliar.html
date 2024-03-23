@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tickets</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="static/style11.css">
+  <style>
+    /* Estilo para ocultar la barra de desplazamiento */
+    body {
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+ 
+  <header class="header">
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-link btn-lg" onclick="goBack()">
+                <i class="fas fa-home"></i> 
+          </button>
+        </div>
+        <div class="col text-center">
+          <h1>Tickets Asignados</h1>
+        </div>
+        <div class="col">
+          <!-- elementos al encabezado  -->
+        </div>
+      </div>
+  </header>
+
+   <!-- nav -->
+   <nav class="navbar navbar-custom">
+    <div></div>
+    <div class="nav-btns">
+      <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Tickets Asignados</a>
+      <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
+    </div>
+  </nav>
+  
+
+  <!-- Contenido principal -->
+  <div class="container mt-4">
+   <div class="table-wrapper">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>N°ticket</th>
+          <th>Autor</th>
+          <th>Departamento</th>
+          <th>Fecha</th>
+          <th>Clasificación</th>
+          <th>Detalle</th>
+          <th>Status</th>
+          <th>Modificar Status</th>
+          <th>Actualizar</th>
+          <th>Comentarios</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in tickets %}
+    <tr>
+      <td>{{ ticket[0] }}</td> <!-- Número de ticket -->
+      <td>{{ ticket[1] }} {{ ticket[2] }}</td> <!-- Nombre y Apellido del cliente -->
+      <td>{{ ticket[3] }}</td> <!-- Departamento -->
+      <td>{{ ticket[4] }}</td> <!-- Fecha de expedición -->
+      <td>{{ ticket[5] }}</td> <!-- Problema -->
+      <td>{{ ticket[6] }}</td> <!-- Descripción del problema -->
+      <td>{{ ticket[7] }}</td> <!-- Status -->
+      <td>
+
+        {% if ticket[7] == 'cancelado' %}
+      
+
+        {% else %}
+          
+          <select id="selectStatus_{{ ticket[0] }}" class="form-control">
+            <option value="">Asignado</option>
+            <option value="En Progreso">En Progreso</option>
+            <option value="Completado">Completado</option>
+          </select>
+
+        {% endif %}
+      </td>    
+      <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}','{{ticket[7] }} ')">Actualizar</button></td>
+      <td>
+        {% if elemento.8 %}
+            <button class="btn btn-info" onclick="mostrarComentarios('{{ elemento.8 }}')">Ver comentarios</button>
+        {% else %}
+            <p>No hay comentarios</p>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  </table>
+  </div>
+  </div>
+
+   <!-- Modal para mostrar comentarios -->
+<div class="modal fade" id="comentariosModal" tabindex="-1" role="dialog" aria-labelledby="comentariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="comentariosModalLabel">Comentarios</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="comentariosTexto"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="row">
+      <div class="col-md-6 text-left">
+        <p>© 2024 - Todos los derechos reservados</p>
+      </div>
+      <div class="col-md-6 text-right">
+        <p>ENGINEERING <span class="resaltado">YOUR</span> SUCCESS.</p>
+      </div>
+    </div>
+  </footer>  
+
+  <!-- Bootstrap JS (jQuery debe incluirse antes) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Script personalizado -->
+
+  <script>
+    function checkOption(select) {
+        var option = select.value;
+        var numeroTicketInput = document.getElementById('numeroTicket');
+
+        if (option === 'ingresar') {
+            numeroTicketInput.style.display = 'block';
+        } else {
+            numeroTicketInput.style.display = 'none';
+        }
+    }
+  </script>
+
+
+<script>
+  function actualizarTicket(ticketId, status) {
+    if (status === 'cancelado'){
+      alert('no puedes actualizar un ticket cancelado');
+      return;
+    }
+
+      var selectElement = document.getElementById('selectAuxiliar_' + ticketId);
+      var selectedAuxiliar = selectElement ? selectElement.value : null;
+
+      if (!selectedAuxiliar) {
+          alert('Por favor, modifique el status del ticket para actualizar');
+          return;
+      }
+
+      // Información a enviar al backend
+      var data = {
+          ticketId: ticketId,
+          auxiliar: selectedAuxiliar,
+          status: 'asignado'
+      };
+
+      // Enviamos la solicitud AJAX al backend
+      fetch('/actualizar_ticket', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+      })
+      .then(response => {
+          if (response.ok) {
+              alert('Ticket actualizado exitosamente');
+              window.location.reload(); // Recargar la página después de la actualización
+          } else {
+              alert('Hubo un error al actualizar el ticket.');
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+
+  function mostrarComentarios(comentarios) {
+        var comentariosTexto = document.getElementById('comentariosTexto');
+        comentariosTexto.innerText = comentarios;
+
+        $('#comentariosModal').modal('show'); 
+    }
+
+</script>
+
+</body>
+</html>
