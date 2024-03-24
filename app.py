@@ -11,9 +11,6 @@ import os
 import pdfkit
 
 
-
-
-
 app = Flask(__name__)
 app.secret_key = 'yes'
 # -> configuración de la base de datos
@@ -128,6 +125,7 @@ def edit_profile():
         }
 
         return render_template('admincliente.html', datos=datos)
+    
 
 @app.route('/login',methods=["GET","POST"])
 def login():
@@ -195,6 +193,43 @@ def change_password():
 
 
 #-------------------------------------------------------------------------------
+# -------------------------------------------Actualizacion del perfil -------------------------------------------------------
+@app.route('/actualizar_perfil', methods=['POST'])
+def actualizar_perfil():
+    if request.method == 'POST':
+        idCliente = session['id']
+        telefono = session['telefono']
+
+        if not idCliente:
+            return jsonify({'error': 'ID del cliente no porporcionado'}), 400
+        
+        #Actualizamos el telefono de la persona en la base de datos
+        cur = mysql.connection.cursor()
+        cur.execute("UPDATE cliente SET telefono = %s WHERE idCliente = %s",(telefono,idCliente))
+        mysql.connection.commit()
+        cur.close()
+
+    #-> Actualización de la fotografia <-
+        
+    if 'photo' in request.files:
+        photo = request.files['photo']
+        if photo.filename != '':
+            filename = os.path.join('static/photos_profile/', str(idCliente) + '.png')
+            photo.save(filename)
+
+            #Actualizamos la foto en la base de datos
+            cur = mysql.connection.cursor()
+            cur.execute("UPDATE cliente SET foto = %s WHERE idCliente = %s", (filename, idCliente))
+            mysql.connection.commit() 
+            cur.close()
+    
+    return jsonify({'message': 'Perfil actualizado con éxito'}), 200
+
+
+
+
+# -------------------------------------------Fin de la actuzlizacion de perfil-----------------------------------------------
+
 # -> Creación de la vista y la ruta para solicitudes de tickets
 
 @app.route('/solicitar_ticket', methods = ['GET','POST'])
