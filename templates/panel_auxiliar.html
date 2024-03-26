@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block titulo %} 
-panel_jefe
+panel_Auxiliar
 {% endblock %}
 
 {% block content %}
@@ -19,8 +19,8 @@ panel_jefe
     </div>
 
     <div class="jumbotron text-center mb-5">
-        <h2 class="display-4">¡Bienvenido, {{nombre}}!</h2>
-        <h2 style="font-size: 50px;">{{paterno}} {{materno}}</h2>
+        <h2 class="display-4">¡Bienvenido, {{datos.nombre}}!</h2>
+        <h2 style="font-size: 50px;">{{datos.paterno}} {{datos.materno}}</h2>
         <h2 class="lead">ID: {{id_personal}}</h2>
     </div>
 
@@ -30,7 +30,7 @@ panel_jefe
                 <div class="card-body">
                     <h5 class="card-title">Administrar Perfil</h5>
                     <p class="card-text">Personaliza y gestiona tu perfil.</p>
-                    <a class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
+                    <a href="{{ url_for('admin_cliente')}}" class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
                 </div>
             </div>
         </div>
@@ -57,11 +57,16 @@ panel_jefe
 
 <div class="organization-container float-left">
     <!-- Agrega aquí el icono de la organización -->
-    <img src="{{ url_for('static', filename='profile.png') }}" alt="Icono de la organización" class="profile-image">
+    <!--<img src="{{ url_for('static', filename='profile.png') }}" alt="Icono de la organización" class="profile-image">-->
+    {% if datos.id is defined %}
+        <img src="{{ url_for('static', filename='photos_profile/' + datos.id|string + '.png') }}" alt="User Photo" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+    {% else %}
+        <img src="{{ url_for('static', filename='photos_profile/default.png') }}" alt="User Photo" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+    {% endif %}
 </div>
 
 <div class="logout">
-    <button class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <button class="btn btn-danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
 </div>
 
 <div class="footer">
@@ -72,7 +77,33 @@ panel_jefe
 
 {% block scripts %}
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function handleLogout(){
+        if(confirm("Estas seguro de querer salir de la aplicación?")){
+            $.ajax({
+                url: '/',
+                type: 'POST',
+                data: {'action': 'logout'},
+                success: function(response){
+                    window.location.href="/";
+                },
+                error: function(error){
+                    console.log("Error:", error);
+                }
+            });
+        }
+    }
+    
+    $(document).ready(function(){
+        $("#logoutBtn").click(function(e){
+            e.preventDefault();
+            handleLogout();
+        });
+    });
+</script>
+
+
 {% endblock %}

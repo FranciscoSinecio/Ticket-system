@@ -41,6 +41,10 @@ def configure_row_factory():
 def index():
     return render_template('login.html')
 
+@app.route('/',methods=['POST'])
+def logout():
+    return redirect(url_for('index'))
+
 @app.route('/panel_cliente')
 def panel_cliente():
     id_cliente = session.get('id', None)
@@ -157,7 +161,7 @@ def login():
             
             elif session['rol'] == 'auxiliar':
 
-                return redirect(url_for('panel_auxiliar'))
+                return redirect(url_for('auxiliar'))
                 
             else:
                 
@@ -752,11 +756,33 @@ def generar_pdf_departamentos():
 # -----------------------------------------------------------------------Visstas y urls para auxiliares -------------------------------------------------------------------------------------------------//
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
+@app.route('/auxiliar')
+def auxiliar():
+    id_personal = session.get('id',None)
 
-@app.route('/panel_auxiliar')
-def panel_auxiliar():
+    if id_personal == None:
+
+        return jsonify({"error": "No se proporciono el ID del personal"}),400
     
-    return 'Hola'
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM cliente WHERE idCliente=%s',(id_personal,))
+    auxiliar = cur.fetchone()
+    
+    if auxiliar is None:
+        return jsonify({"error":"No se encontró el auxiliar en la base de datos con el ID proporcionado"})
+    
+    auxiliar_data ={
+        'id': auxiliar[0],
+        'nombre':auxiliar[1],
+        'paterno': auxiliar[2],
+        'materno': auxiliar[3],
+        'mail': auxiliar[4],
+        'tel': auxiliar[6],
+        'rol':auxiliar[7],
+        'dpto':auxiliar[8],
+    }
+
+    return render_template('panel_auxiliar.html',datos = auxiliar_data, id_personal=id_personal)
 
 
 if __name__ =='__main__':
