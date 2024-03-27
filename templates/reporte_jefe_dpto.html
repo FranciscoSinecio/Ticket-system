@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte_jefe_dptp</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            background:#f5f3f0;
+        }
+        
+        .container_imagen{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            background:#7bc0aa ;
+            border-radius: 10px;
+        }
+        .container_imagen h1{
+            padding: 10px 0 0 20px;
+            margin: 20px 0 10px 0;
+            font-size: 30px;
+        }
+        .container_datos{
+            display: flex;
+            justify-content: flex-end;
+            flex-direction: column;
+
+        }
+        .container_datos p{
+            font-size: 20px;
+            text-align: end;
+            padding: 2px;
+            margin:10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="container_imagen">
+            <img src="/static/photos_profile/Macuin_dash.jpg" alt="Imagen_macuin" style="height:150px;">
+            <h1>Macuin Dashboards<br>Reportes por departamento</h1>
+        </div>
+    
+        <div class="container_datos">
+            <p>Fecha: {{fecha}}</p>
+            <p>Nombre: {{nombre_jefe}}</p>
+        </div>
+
+    </div>
+    
+</body>
+</html>
