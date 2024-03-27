@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+    {% block estilos %}
+    
+        <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+        <!-- Agrega el enlace a Bootstrap -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- Agrega el enlace a la biblioteca Draggable -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/draggable/1.0.1-beta.10/draggable.bundle.legacy.min.js"></script>
+        <!-- Agrega el enlace al conjunto de iconos FontAwesome -->
+        <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    {% endblock %}
+    
+    {% block titulo %} Administrar Perfil {% endblock %}
+
+
+    {% block content %}
+        <!-- Header -->
+        
+        <header class="header">
+            <div class="row">
+            <div class="col">
+                <button class="btn btn-link btn-lg" onclick="goBack()">
+                    <i class="fas fa-home"></i> 
+                </button>
+            </div>
+            <div class="col text-center">
+                <h1>Administrar Perfil</h1>
+            </div>
+            <div class="col">
+                <!-- elementos al encabezado  -->
+            </div>
+            </div>
+        </header>
+
+        <!-- nav -->
+        <nav class="navbar navbar-custom">
+        <div></div>
+        <div class="nav-btns">
+            <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+            <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Tickets Asignados</a>
+            <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
+        </div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="profile-container text-center">
+                        <!-- Aplica el estilo a la imagen de perfil -->
+                        <img src="{{ url_for('static', filename='photos_profile/1202125.png') }}" alt="User Photo" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+                        <h2> {{ datos.nombre }} {{datos.ap_paterno}} {{datos.ap_materno}} </h2>
+                        <p>Email: {{ datos.email }}</p>
+                        <p>Teléfono: {{ datos.telefono }}</p>
+                        <p>ID Usuario: {{ datos.id }}</p>
+                        <p>Departamento: {{ datos.dpto }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" onclick="openEditModal()">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </button>
+                        <button class="btn btn-warning" onclick="openPasswordModal()">
+                            <i class="fas fa-key"></i> Cambiar Contraseña
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Editing Profile -->
+        <div id="editModal" class="modal draggable">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Perfil</h5>
+                        <button type="button" class="close" onclick="closeEditModal()">&times;</button>
+                    </div>
+                    <!-- Form for editing profile details -->
+                    <form action="{{ url_for('admin_cliente') }}" method="POST" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="photo">Cambiar Foto de Usuario:</label>
+                                <input type="file" id="photo" name="photo" accept="image/*">
+                                <small class="form-text text-muted">Selecciona una imagen para tu perfil.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Teléfono:</label>
+                                <input type="tel" id="phone" name="phone" value="{{datos.telefono}}" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cerrar</button>
+                            <button type="button" class="btn btn-success" onclick="confirmProfileChanges()">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Changing Password -->
+        <div id="passwordModal" class="modal draggable">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cambiar Contraseña</h5>
+                        <button type="button" class="close" onclick="closePasswordModal()">&times;</button>
+                    </div>
+                    <!-- Form for changing password -->
+                    <form action="" method="POST">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="current_password">Contraseña Actual:</label>
+                                <input type="password" id="current_password" name="current_password" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new_password">Nueva Contraseña:</label>
+                                <input type="password" id="new_password" name="new_password" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_new_password">Confirmar Nueva Contraseña:</label>
+                                <input type="password" id="confirm_new_password" name="confirm_new_password" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closePasswordModal()">Cerrar</button>
+                            <button type="button" class="btn btn-success" onclick="confirmPasswordChange()">Guardar Cambios de Contraseña</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <p>Todos los derechos reservados &copy; 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+    
+    {% endblock %}
+
+        {% block scripts %}  
+
+            <!-- Agrega los enlaces a las bibliotecas de Bootstrap y jQuery -->
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+            <!-- Tu script personalizado -->
+            <script src="{{ url_for('static', filename='admincliente.js') }}"></script>
+            
+            <script>
+                function confirmPasswordChange(){
+                    var passwordActual = document.getElementById('current_password').value;
+                    var passwordNuevo = document.getElementById('new_password').value;
+                    var confirmacionPassword = document.getElementById('confirm_new_password').value;
+
+                    if (passwordNuevo != confirmacionPassword){
+                        alert('Error: Las contraseñas nuevas no coinciden');
+                        return;
+                    }
+                    //Enviamos la solicitud ajax hacia el backend
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/change_password', true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.onload = function(){
+                    
+                    if (xhr.status == 200){
+                        alert('¡Contraseña cambiada exitosamente!');
+                        closePasswordModal();
+                    } else {
+                        alert('¡Error!, no se pudo actualizar la contraseña')
+                    }
+                    };
+    
+                    xhr.send(JSON.stringify({passwordActual: passwordActual, passwordNuevo: passwordNuevo}));
+                }
+
+                function closePasswordModal(){
+                    document.getElementById('passwordModal').style.display = 'none';
+                }
+                
+            </script>
+
+        {% endblock %}
+
