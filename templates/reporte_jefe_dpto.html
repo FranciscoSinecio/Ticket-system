@@ -28,8 +28,9 @@
         }
         .container_datos{
             display: flex;
-            justify-content: flex-end;
+            justify-content: right 100px;
             flex-direction: column;
+        
 
         }
         .container_datos p{
@@ -38,6 +39,17 @@
             padding: 2px;
             margin:10px;
         }
+        .container_contenido p{
+            font-size: 30px;
+        }
+        .tabla th{
+
+            align-items: center;
+        }
+        .tabla td{
+            align-items: flex-start;
+        }
+       
 
     </style>
 </head>
@@ -51,6 +63,47 @@
         <div class="container_datos">
             <p>Fecha: {{fecha}}</p>
             <p>Nombre: {{nombre_jefe}}</p>
+        </div>
+
+        <div class="container_contenido">
+        <p>DEPARTAMENTO : {{departamento }}</p><br><br>
+
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Id cliente</th>
+                    <th>Nombre completo</th>
+                    <th>Correo</th>
+                    <th>id Ticket</th>
+                    <th>Problema</th>
+                    <th>Descripcion</th>
+                    <th>Fecha expedición</th>
+                    <th>Fecha termino</th>
+                    <th>Estatus</th>
+                    <th>Comentarios</th>
+                </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+                <tr>
+                    <td>01</td>
+                    <td>Fred Gonzalo Urbina </td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                    <td>{{ ticket.id_cliente}}</td>
+                </tr>
+            {% endfor %}
+        
+        </tbody>
+
+
+        </table>
+
         </div>
 
     </div>
