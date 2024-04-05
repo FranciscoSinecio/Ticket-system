@@ -686,6 +686,10 @@ def eliminar_usuario(idUsuario):
 # Ruta para generar el PDF
 @app.route('/generar_pdf/<reportType>')
 def generar_pdf(reportType):
+
+    report_type_valor = reportType
+
+    print(f"El valor impreso de report type es ---> {report_type_valor}")
     # Lógica para generar el contenido del PDF
     if reportType == "Tickets":
         # Aquí se genera el contenido del PDF de reporte de tickets
@@ -694,13 +698,16 @@ def generar_pdf(reportType):
     
     elif reportType == "Auxiliares":
         # Aquí se genera el contenido del PDF de reporte de auxiliares
-        return generar_pdf_auxiliares()
+        direccion_pdf = generar_pdf_auxiliar()
+    
     elif reportType == "Departamentos":
         # Aquí se genera el contenido del PDF de reporte de departamentos
-        return generar_pdf_departamentos()
+        direccion_pdf = generar_pdf_dptos()
     else:
         return "Tipo de reporte no válido"
-
+    
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& FUnciones para hacer los pdf's&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&    
 # Función para generar el PDF de reporte de tickets
 def generar_pdf_tickets():
 
@@ -744,13 +751,138 @@ def generar_pdf_tickets():
     print (html)
     pdfkit.from_string(html,'Reporte_tickets.pdf', configuration = config)
 
-
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     
-def generar_pdf_auxiliares():
-    pass
+def generar_pdf_auxiliar():
+    path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
+    path_to_executable = os.path.join(path_to_wkhtmltopdf, "wkhtmltopdf.exe")
+    config = pdfkit.configuration(wkhtmltopdf=path_to_executable)
 
-def generar_pdf_departamentos():
-    pass
+    amb = Environment(loader=FileSystemLoader("templates"))
+    template = amb.get_template("reporte_jefe_aux.html")
+
+    cur = mysql.connection.cursor()
+    consulta = """SELECT
+                    c.nombre,
+                    c.apellido_paterno,
+                    t.id_ticket,
+                    t.Problema,
+                    t.Descripcion_problema,
+                    t.fecha_expedicion,
+                    t.status,
+                    t.comentarios_auxiliar
+                FROM
+                    cliente c
+                JOIN
+                    `tickets` t ON c.idCliente = t.idAuxiliar
+                WHERE
+                    c.rol = 'auxiliar'
+                    """
+    cur.execute(consulta)
+
+    auxiliar_tickets = cur.fetchall()
+    cur.close()
+
+    auxiliares = {}
+    for ticket in auxiliar_tickets:
+        nombre_auxiliar = f"{ticket[0]} {ticket[1]}"  # Acceder a los elementos por índice numérico
+        if nombre_auxiliar not in auxiliares:
+            auxiliares[nombre_auxiliar] = {
+                'tickets': []
+            }
+        
+        auxiliares[nombre_auxiliar]['tickets'].append({
+            'id_ticket': ticket[2],
+            'Problema': ticket[3],
+            'Descripcion_problema': ticket[4],
+            'fecha_expedicion': ticket[5].strftime('%Y-%m-%d'),
+            'status': ticket[6],
+            'comentarios_auxiliar': ticket[7]
+        })
+
+    fecha_hoy = datetime.now().date()
+    fecha_formato = fecha_hoy.strftime('%Y-%m-%d')
+    nombre_jefe = {
+        'jefe_nombre': session.get('nombre_sh', None),
+        'jefe_apellido': session.get('ap_pat', None)
+    }
+
+    html = render_template('reporte_jefe_aux.html',
+                            fecha_formato=fecha_formato,
+                            nombre_jefe=nombre_jefe,
+                            auxiliares=auxiliares)
+    
+    pdfkit.from_string(html, 'Reporte_auxiliares_jefe.pdf', configuration=config)
+    pdf_path = os.path.join(os.getcwd(), 'Reporte_auxiliares_jefe.pdf')
+
+    return pdf_path
+
+def generar_pdf_dptos():
+    
+    path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
+    path_to_executable = os.path.join(path_to_wkhtmltopdf, "wkhtmltopdf.exe")
+    config = pdfkit.configuration(wkhtmltopdf=path_to_executable)
+    amb = Environment(loader=FileSystemLoader("templates"))
+    template = amb.get_template("reporte_jefe_x_dpto.html")
+
+    #activo el cursor para realizar las consultas
+
+    cur = mysql.connection.cursor()
+    consult = """
+                    SELECT
+                            c.IdCliente,
+                            c.nombre,
+                            c.apellido_paterno,
+                            c.apellido_materno,
+                            c.correo_electronico,
+                            c.telefono, 
+                            d.nombre_departamento
+                    FROM
+                            cliente c
+                    JOIN
+                            departamentos d ON c.idDepartamento = d.idDepartamento
+                    WHERE
+                            c.rol = 'cliente'
+                            """
+    cur.execute(consult)
+    departamentos_data = cur.fetchall()
+    cur.close()
+    print(f'esta es la info de la base de datos obtenida---->{departamentos_data}')
+    departamentos= {}
+
+    for cliente in departamentos_data:
+        nombre_departamento = cliente[6]
+        if nombre_departamento not in departamentos:
+            departamentos[nombre_departamento]={
+                'clientes':[]
+            }
+        departamentos[nombre_departamento]['clientes'].append({
+            
+            'idCliente':cliente[0],
+            'nombre':cliente[1],
+            'apellido_paterno':cliente[2],
+            'apellido_materno':cliente[3],
+            'correo_electronico':cliente[4],
+            'telefono':cliente[5]
+
+        })
+    fecha_hoy = datetime.now().date()
+    fecha_formato = fecha_hoy.strftime('%Y-%m-%d')
+    nombre_jefe={
+        
+        'jefe_nombre':session.get('nombre_sh',None),
+        'jefe_apellido':session.get('ap_pat',None)
+        
+    }
+
+    html = render_template('reporte_jefe_x_dpto.html',
+                            fecha_formato = fecha_formato,
+                            nombre_jefe = nombre_jefe,
+                            departamentos = departamentos)
+    pdfkit.from_string(html,'Reporte_dptos_jefe.pdf',configuration=config)
+    pdf_path = os.path.join(os.getcwd(),'Reporte_dptos_jefe.pdf')
+    return pdf_path
+
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 # -----------------------------------------------------------------------Visstas y urls para auxiliares -------------------------------------------------------------------------------------------------//
