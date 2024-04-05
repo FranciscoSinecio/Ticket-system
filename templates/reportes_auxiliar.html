@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/css-button-hover-effects/1.0.0/css/button-hover.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="static/style12.css">
+
+  <style>
+    /* Estilo para ocultar la barra de desplazamiento */
+    body {
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+ 
+  <header class="header">
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-link btn-lg" onclick="goBack()">
+              <i class="fas fa-home"></i> 
+        </button>
+      </div>
+      <div class="col text-center">
+        <h1>Reportes</h1>
+      </div>
+      <div class="col">
+        <!-- elementos al encabezado  -->
+      </div>
+    </div>
+</header>
+
+ <!-- nav -->
+ <nav class="navbar navbar-custom">
+  <div></div>
+  <div class="nav-btns">
+    <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+    <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Tickets Asignados</a>
+    <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
+  </div>
+</nav>
+
+<!-- Mas contenido-->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card h-100 mb-4 shadow">
+            <div class="card-body">
+                <h5 class="card-title text-dark"><i class="fas fa-user-cog"></i> Reportes de estatus</h5>
+                <p class="card-text text-dark">Este reporte ofrece datos sobre el estatus de tus tickets asignados.</p>
+                <a id="downloadBtnEstatus" class="btn btn-primary btn-danger" onclick="downloadPDF('estatus')"><i class="fas fa-download"></i> Descargar PDF</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 mb-4 shadow">
+            <div class="card-body">
+                <h5 class="card-title text-dark"><i class="fas fa-search"></i> Reportes de departamentos</h5>
+                <p class="card-text text-dark">Este reporte proporciona análisis de los diferentes departamentos en la organización.</p>
+                <a id="downloadBtnDepartamentos" class="btn btn-primary btn-danger" onclick="downloadPDF('departamentos')"><i class="fas fa-download"></i> Descargar PDF</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 mb-4 shadow">
+            <div class="card-body">
+                <h5 class="card-title text-dark"><i class="far fa-calendar-alt"></i> Reportes por fechas</h5>
+                <p class="card-text text-dark">Este reporte muestra información basada en fechas específicas.</p>
+                <input type="text" id="fechaSeleccionada" class="form-control mb-2" placeholder="Seleccionar fecha">
+                <a id="downloadBtnFechas" class="btn btn-primary btn-danger" onclick="downloadPDFWithDate('fechas')"><i class="fas fa-download"></i> Descargar PDF</a>
+            </div>
+        </div>
+    </div>    
+
+  <footer class="footer">
+    <div class="row">
+      <div class="col-md-6 text-left">
+        <p>© 2024 - Todos los derechos reservados</p>
+      </div>
+      <div class="col-md-6 text-right">
+        <p>ENGINEERING <span class="resaltado">YOUR</span> SUCCESS.</p>
+      </div>
+    </div>
+  </footer>  
+
+  <!-- Bootstrap JS (jQuery debe incluirse antes) -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+
+  
+
+  <!-- Script personalizado -->
+
+  
+  <script>
+    function downloadPDF(reportType) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/generar_pdf/' + reportType, true);
+      xhr.responseType = 'blob';
+      xhr.onload = function () {
+        if (this.status === 200) {
+          var blob = new Blob([this.response], { type: 'application/pdf' });
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = reportType + '_reporte.pdf';
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+
+          // Mostrar ventana emergente de satisfacción
+          Swal.fire({
+            icon: 'success',
+            title: 'Descarga exitosa',
+            text: 'El PDF se ha descargado correctamente.',
+            timer: 3000, // Cerrar automáticamente después de 3 segundos
+            timerProgressBar: true,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false
+          });
+        } else {
+          console.error('Error al descargar el PDF');
+          alert('Error al descargar el pdf. Por favor inténtalo de nuevo más tarde');
+        }
+      };
+      xhr.onerror = function () {
+        console.error('Error de red al descargar el PDF');
+        alert('Error de red al descargar el PDF');
+      }
+      xhr.send();
+    }
+  </script>  
+  
+  <script>
+    $(function() {
+        $("#fechaSeleccionada").datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+    });
+
+    function downloadPDFWithDate(reportType) {
+        var selectedDate = $("#fechaSeleccionada").val();
+        if (selectedDate === "") {
+            alert("Por favor, selecciona una fecha antes de descargar el PDF.");
+            return;
+        }
+
+        // Aquí puedes realizar la lógica para descargar el PDF con la fecha seleccionada
+        // Puedes usar la variable 'selectedDate' para obtener la fecha seleccionada
+        // Ejemplo: /generar_pdf/' + reportType + '?fecha=' + selectedDate
+    }
+</script>
+
+</body>
+</html>
