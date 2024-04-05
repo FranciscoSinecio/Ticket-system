@@ -59,35 +59,23 @@
     text-align: center; /* Centrar el título */
   }
   
-  .btn-link {
+  
+  button.btn-link {
     padding: 8px 16px;
     color: #fff;
     font-size: 16px;
+    margin-right: 300px; /* Ajuste para acercar el botón a la izquierda */
     background-color: var(--primary-color); /* Resalta el botón de regresar */
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    position: absolute;
-    left: 100px; /* Ajustar la posición del botón de regresar hacia la izquierda */
-    top: 50%;
-    transform: translateY(-50%);
   }
   
-  .btn-link:hover {
-    background-color: #2980b9; /* Cambia el color al pasar el ratón */
+  button.btn-link:hover {
+    background-color: #ffffff; /* Cambia el color al pasar el ratón */
     text-decoration: none;
-  }
-  
-  .btn-link {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 18px;
-  }
-  
-  .btn-link:hover {
-    text-decoration: underline;
-  }
+  }  
   
   .navbar {
     background-color: #000000;
