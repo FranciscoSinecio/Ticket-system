@@ -703,6 +703,11 @@ def generar_pdf(reportType):
     elif reportType == "Departamentos":
         # Aquí se genera el contenido del PDF de reporte de departamentos
         direccion_pdf = generar_pdf_dptos()
+
+    elif reportType == "Fechas":
+        fecha_inio = request.args.get('start')
+        fecha_fin = request.args.get('end')
+        direccion_pdf = generar_pdf_fechas(fechas_inicio, fechas_fin)
     else:
         return "Tipo de reporte no válido"
     
@@ -817,6 +822,8 @@ def generar_pdf_auxiliar():
 
     return pdf_path
 
+#&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
 def generar_pdf_dptos():
     
     path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
@@ -883,6 +890,50 @@ def generar_pdf_dptos():
     pdf_path = os.path.join(os.getcwd(),'Reporte_dptos_jefe.pdf')
     return pdf_path
 
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+def generar_pdf_fechas(fecha_inicio, fecha_fin):
+
+    path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
+    path_to_executable = os.path.join(path_to_wkhtmltopdf, "wkhtmltopdf.exe")
+    config = pdfkit.configuration(wkhtmltopdf=path_to_executable)
+
+    amb = Environment(loader=FileSystemLoader("templates"))
+    template = amb.get_template("template_fechas.html")
+
+    cur = mysql.connection.cursor()
+    consulta = """
+                    SELECT
+                    t.id_ticket,
+                    t.Problema,
+                    t.Descripcion_problema,
+                    t.fecha_expedicion,
+                    t.fecha_termino,
+                    t.status,
+                    COALESCE(c.nombre, 'N/A') AS nombre_cliente,
+                    COALESCE(a.nombre, 'N/A') AS nombre_auxiliar
+                FROM 
+                    tickets t
+                LEFT JOIN 
+                    cliente c ON t.idCliente = c.idCliente AND c.rol = 'cliente'
+                LEFT JOIN 
+                    cliente a ON t.idAuxiliar = a.idCliente AND a.rol = 'auxiliar'
+                WHERE
+                    t.fecha_expedicion BETWEEN %s AND %s
+                """
+    cur.execute(consulta, (fecha_inicio, fecha_fin))
+    data = cur.fetchall()
+    cur.close
+    
+    fecha_formato = datetime.now().strftime('%Y-%m-%d')
+    
+    html = render_template('template_fechas.html', data=data, fecha_formato = fecha_formato)
+
+    pdfkit.from_string(html,'Reporte_fechas.pdf',configuration = config)
+    pdf_path = os.path.join(os.getcwd(),'Reporte_fechas.pdf')
+
+    return pdf_path
+    
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 # -----------------------------------------------------------------------Visstas y urls para auxiliares -------------------------------------------------------------------------------------------------//
