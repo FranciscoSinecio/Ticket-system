@@ -72,15 +72,15 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card h-100 mb-4 shadow">
-            <div class="card-body">
-                <h5 class="card-title text-dark"><i class="far fa-calendar-alt"></i> Reportes por fechas</h5>
-                <p class="card-text text-dark">Este reporte muestra información basada en fechas específicas.</p>
-                <input type="text" id="fechaSeleccionada" class="form-control mb-2" placeholder="Seleccionar fecha">
-                <a id="downloadBtnFechas" class="btn btn-primary btn-danger" onclick="downloadPDFWithDate('fechas')"><i class="fas fa-download"></i> Descargar PDF</a>
-            </div>
-        </div>
-    </div>    
+      <div class="card h-100 mb-4 shadow">
+          <div class="card-body">
+              <h5 class="card-title text-dark"><i class="far fa-calendar-alt"></i> Reportes por fechas</h5>
+              <p class="card-text text-dark">Este reporte muestra información basada en fechas específicas.</p>
+              <input type="text" id="fechaSeleccionada" class="form-control mb-2" placeholder="Seleccionar mes y año">
+              <a id="downloadBtnFechas" class="btn btn-primary btn-danger" onclick="downloadPDFWithDate('fechas')"><i class="fas fa-download"></i> Descargar PDF</a>
+          </div>
+      </div>
+  </div>  
 
   <footer class="footer">
     <div class="row">
@@ -152,19 +152,30 @@
   <script>
     $(function() {
         $("#fechaSeleccionada").datepicker({
-            dateFormat: 'yy-mm-dd'
+            dateFormat: 'yy-mm',
+            changeMonth: true,
+            changeYear: true,
+            showOn: "both",
+            buttonImageOnly: true,
+            buttonImage: "https://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+            buttonText: "Seleccionar fecha",
+            onClose: function(dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month option:selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year option:selected").val();
+                $(this).val($.datepicker.formatDate('yy-mm', new Date(year, month, 1)));
+            }
         });
     });
 
     function downloadPDFWithDate(reportType) {
         var selectedDate = $("#fechaSeleccionada").val();
         if (selectedDate === "") {
-            alert("Por favor, selecciona una fecha antes de descargar el PDF.");
+            alert("Por favor, selecciona un mes y un año antes de descargar el PDF.");
             return;
         }
 
-        // Aquí puedes realizar la lógica para descargar el PDF con la fecha seleccionada
-        // Puedes usar la variable 'selectedDate' para obtener la fecha seleccionada
+        // Aquí puedes realizar la lógica para descargar el PDF con el mes y el año seleccionados
+        // Puedes usar la variable 'selectedDate' para obtener el mes y el año seleccionados
         // Ejemplo: /generar_pdf/' + reportType + '?fecha=' + selectedDate
     }
 </script>
