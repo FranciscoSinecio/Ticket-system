@@ -77,8 +77,11 @@ panel_jefe
 </div>
 
 <div class="organization-container float-right">
-    <!-- Agrega aquí el icono de la organización -->
-    <img src="{{ url_for('static', filename='profile.png') }}" alt="Icono de la organización" class="profile-image">
+    {% if user_photo %}
+        <img src="{{ url_for('static', filename='photos_profile/' + user_photo) }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+    {% else %}
+        <img src="{{ url_for('static', filename='photos_profile/default_profile.jpg') }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+    {% endif %}
 </div>
 
 <div class="footer">

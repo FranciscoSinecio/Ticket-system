@@ -337,8 +337,10 @@ def panel_jefe():
     nombre = session.get('nombre_sh',None)
     paterno = session.get('ap_pat',None)
     materno = session.get('ap_mat', None)
+
+    user_photo = obtener_ruta_foto(id_personal)
     
-    return render_template('panel_jefe.html',id_personal = id_personal, nombre=nombre, paterno = paterno, materno = materno)
+    return render_template('panel_jefe.html',id_personal = id_personal, nombre=nombre, paterno = paterno, materno = materno, user_photo=user_photo)
 
 @app.route('/consultaJefeTicket')
 def consultaJefeTicket():
@@ -436,32 +438,41 @@ def actualizar_ticket():
     # Devolvemos el mensaje de actualizacion con Json
     response = {'message': 'Ticket actualizado exitosamente'}
     return jsonify(response), 200
-
-
     
 @app.route('/comentarios', methods=['POST'])
 def comentarios():
-    if request.method == 'POST':
-        data = request.get_json()
-        comentarios = data['comentarios']
+    try:
+        data = request.json
         id_ticket = data['id_ticket']
+        tipoUsuario = data['tipoUsuario']
+        comentarios = data['comentarios']
 
-        try:
-            # Conectar a la base de datos
+        print(f'la info enviada desde front es ---> {id_ticket} ----> {tipoUsuario}  -----> {comentarios}')
+
+        if tipoUsuario == 'cliente':
             cur = mysql.connection.cursor()
-
-            # Actualizar el campo de comentarios en la tabla tickets
-            cur.execute("UPDATE tickets SET Comentarios = %s WHERE id_ticket = %s", (comentarios, id_ticket))
+            cur.execute("""
+                        UPDATE tickets
+                        SET comentarios_cliente = %s
+                        WHERE id_ticket = %s""",
+                        (comentarios,id_ticket))
+            mysql.connection.commit()
+            cur.close()
+        elif tipoUsuario == 'auxiliar':
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                        UPDATE tickets
+                        SET comentarios_auxiliar = %s
+                        WHERE id_ticket = %s""",
+                        (comentarios,id_ticket))
             mysql.connection.commit()
             cur.close()
 
-            return 'Comentario enviado correctamente'
+        return jsonify({"message": "Comentarios guardados correctamente"}, 200)
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-        except Exception as e:
-            return f"Error al enviar el comentario: {str(e)}"
-
-    else:
-        return 'Método no permitido'
 
 
 @app.route('/departamentos')
