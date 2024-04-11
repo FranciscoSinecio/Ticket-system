@@ -52,8 +52,24 @@ def panel_cliente():
     ap_paterno = session.get('ap_pat', None)
     ap_materno = session.get('ap_mat', None)
     email = session.get('email', None)
-    return render_template('panel_cliente.html', id_cliente=id_cliente, nombre=nombre, ap_paterno= ap_paterno, ap_materno = ap_materno)
 
+    user_photo = obtener_ruta_foto(id_cliente)
+
+    return render_template('panel_cliente.html', id_cliente=id_cliente, nombre=nombre, ap_paterno= ap_paterno, ap_materno = ap_materno, user_photo=user_photo)
+
+# Funcion para la obtencion de la foto
+def obtener_ruta_foto(idCliente):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT foto FROM cliente WHERE idCliente = %s",(idCliente,))
+    user_photo = cursor.fetchone()
+    cursor.close()
+
+    if user_photo and user_photo[0]:
+        return str(idCliente) + '.png'
+    else:
+        return 'default_profile.png'
+    
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
 @app.route('/admin_cliente')
 def admin_cliente():
     id_personal = session.get('id', None)
@@ -321,8 +337,10 @@ def panel_jefe():
     nombre = session.get('nombre_sh',None)
     paterno = session.get('ap_pat',None)
     materno = session.get('ap_mat', None)
+
+    user_photo = obtener_ruta_foto(id_personal)
     
-    return render_template('panel_jefe.html',id_personal = id_personal, nombre=nombre, paterno = paterno, materno = materno)
+    return render_template('panel_jefe.html',id_personal = id_personal, nombre=nombre, paterno = paterno, materno = materno, user_photo=user_photo)
 
 @app.route('/consultaJefeTicket')
 def consultaJefeTicket():
@@ -420,32 +438,41 @@ def actualizar_ticket():
     # Devolvemos el mensaje de actualizacion con Json
     response = {'message': 'Ticket actualizado exitosamente'}
     return jsonify(response), 200
-
-
     
 @app.route('/comentarios', methods=['POST'])
 def comentarios():
-    if request.method == 'POST':
-        data = request.get_json()
-        comentarios = data['comentarios']
+    try:
+        data = request.json
         id_ticket = data['id_ticket']
+        tipoUsuario = data['tipoUsuario']
+        comentarios = data['comentarios']
 
-        try:
-            # Conectar a la base de datos
+        print(f'la info enviada desde front es ---> {id_ticket} ----> {tipoUsuario}  -----> {comentarios}')
+
+        if tipoUsuario == 'cliente':
             cur = mysql.connection.cursor()
-
-            # Actualizar el campo de comentarios en la tabla tickets
-            cur.execute("UPDATE tickets SET Comentarios = %s WHERE id_ticket = %s", (comentarios, id_ticket))
+            cur.execute("""
+                        UPDATE tickets
+                        SET comentarios_cliente = %s
+                        WHERE id_ticket = %s""",
+                        (comentarios,id_ticket))
+            mysql.connection.commit()
+            cur.close()
+        elif tipoUsuario == 'auxiliar':
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                        UPDATE tickets
+                        SET comentarios_auxiliar = %s
+                        WHERE id_ticket = %s""",
+                        (comentarios,id_ticket))
             mysql.connection.commit()
             cur.close()
 
-            return 'Comentario enviado correctamente'
+        return jsonify({"message": "Comentarios guardados correctamente"}, 200)
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-        except Exception as e:
-            return f"Error al enviar el comentario: {str(e)}"
-
-    else:
-        return 'Método no permitido'
 
 
 @app.route('/departamentos')
@@ -703,6 +730,11 @@ def generar_pdf(reportType):
     elif reportType == "Departamentos":
         # Aquí se genera el contenido del PDF de reporte de departamentos
         direccion_pdf = generar_pdf_dptos()
+
+    elif reportType == "Fechas":
+        fecha_inio = request.args.get('start')
+        fecha_fin = request.args.get('end')
+        direccion_pdf = generar_pdf_fechas(fechas_inicio, fechas_fin)
     else:
         return "Tipo de reporte no válido"
     
@@ -817,6 +849,8 @@ def generar_pdf_auxiliar():
 
     return pdf_path
 
+#&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
 def generar_pdf_dptos():
     
     path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
@@ -883,6 +917,50 @@ def generar_pdf_dptos():
     pdf_path = os.path.join(os.getcwd(),'Reporte_dptos_jefe.pdf')
     return pdf_path
 
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+def generar_pdf_fechas(fecha_inicio, fecha_fin):
+
+    path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
+    path_to_executable = os.path.join(path_to_wkhtmltopdf, "wkhtmltopdf.exe")
+    config = pdfkit.configuration(wkhtmltopdf=path_to_executable)
+
+    amb = Environment(loader=FileSystemLoader("templates"))
+    template = amb.get_template("template_fechas.html")
+
+    cur = mysql.connection.cursor()
+    consulta = """
+                    SELECT
+                    t.id_ticket,
+                    t.Problema,
+                    t.Descripcion_problema,
+                    t.fecha_expedicion,
+                    t.fecha_termino,
+                    t.status,
+                    COALESCE(c.nombre, 'N/A') AS nombre_cliente,
+                    COALESCE(a.nombre, 'N/A') AS nombre_auxiliar
+                FROM 
+                    tickets t
+                LEFT JOIN 
+                    cliente c ON t.idCliente = c.idCliente AND c.rol = 'cliente'
+                LEFT JOIN 
+                    cliente a ON t.idAuxiliar = a.idCliente AND a.rol = 'auxiliar'
+                WHERE
+                    t.fecha_expedicion BETWEEN %s AND %s
+                """
+    cur.execute(consulta, (fecha_inicio, fecha_fin))
+    data = cur.fetchall()
+    cur.close
+    
+    fecha_formato = datetime.now().strftime('%Y-%m-%d')
+    
+    html = render_template('template_fechas.html', data=data, fecha_formato = fecha_formato)
+
+    pdfkit.from_string(html,'Reporte_fechas.pdf',configuration = config)
+    pdf_path = os.path.join(os.getcwd(),'Reporte_fechas.pdf')
+
+    return pdf_path
+    
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 # -----------------------------------------------------------------------Visstas y urls para auxiliares -------------------------------------------------------------------------------------------------//
