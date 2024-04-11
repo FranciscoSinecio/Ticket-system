@@ -52,8 +52,24 @@ def panel_cliente():
     ap_paterno = session.get('ap_pat', None)
     ap_materno = session.get('ap_mat', None)
     email = session.get('email', None)
-    return render_template('panel_cliente.html', id_cliente=id_cliente, nombre=nombre, ap_paterno= ap_paterno, ap_materno = ap_materno)
 
+    user_photo = obtener_ruta_foto(id_cliente)
+
+    return render_template('panel_cliente.html', id_cliente=id_cliente, nombre=nombre, ap_paterno= ap_paterno, ap_materno = ap_materno, user_photo=user_photo)
+
+# Funcion para la obtencion de la foto
+def obtener_ruta_foto(idCliente):
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT foto FROM cliente WHERE idCliente = %s",(idCliente,))
+    user_photo = cursor.fetchone()
+    cursor.close()
+
+    if user_photo and user_photo[0]:
+        return str(idCliente) + '.png'
+    else:
+        return 'default_profile.png'
+    
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
 @app.route('/admin_cliente')
 def admin_cliente():
     id_personal = session.get('id', None)

@@ -13,9 +13,7 @@
     {%endblock%}
 
         {% block content%}
-        <h1 style="font-size: 30px;
-                    font-family: sans-serif;">
-        </h1>
+        <h1 style="font-size: 30px; font-family: sans-serif;"></h1>
         <div class="gradient-background"></div>
 
         <div class="container mt-5">
@@ -60,10 +58,25 @@
             </div>
         </div>
 
-        <div class="organization-container float-right">
+        <!--<div class="organization-container float-right">
             <!-- Agrega aquí el icono de la organización -->
-            <img src="{{ url_for('static', filename='photos_profile/1202125.png') }}" alt="Icono de la organización" class="profile-image">
-        </div>
+            <!--<img src="{{ url_for('static', filename=user_photo) }}" alt="Foto de perfil" class="profile-image">
+        </div>-->
+        
+            <div div class="organization-container float-right">
+                {% if user_photo %}
+                    <img src="{{ url_for('static', filename='photos_profile/' + user_photo) }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='photos_profile/default_profile.jpg') }}" alt="Foto de perfil" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+                {% endif %}
+
+
+            
+            </div>
+        
+    </div>
+</div>
+        
 
         <div class="footer">
             <p>Todos los derechos reservados &copy; 2024</p>
@@ -77,3 +90,4 @@
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         {% endblock %}
+
