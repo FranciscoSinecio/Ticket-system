@@ -72,10 +72,10 @@ body {
     margin-top: 20px;
 }
 
-.float-right {
-    position: absolute;
+.float-left {
+    position: fixed;
     top: 20px;
-    right: 20px;
+    left: 20px;
 }
 
 .organization-container img {
@@ -95,4 +95,11 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
+}
+
+.logout {
+    position: fixed;
+    top: 50px; /* Distancia desde el borde superior */
+    right: 40px; /* Distancia desde el borde derecho */
+    z-index: 999; /* Asegura que esté por encima de otros elementos */
 }
