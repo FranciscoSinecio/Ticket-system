@@ -34,7 +34,7 @@ panel_Auxiliar
                 <div class="card-body">
                     <h5 class="card-title">Administrar Perfil</h5>
                     <p class="card-text">Personaliza y gestiona tu perfil.</p>
-                    <a href="{{ url_for('admin_cliente')}}" class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
+                    <a href="{{ url_for('edit_profile')}}" class="btn btn-primary"><i class="fas fa-user-cog"></i> Ir</a>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@ panel_Auxiliar
                 <div class="card-body">
                     <h5 class="card-title">Tickets Asignados</h5>
                     <p class="card-text">Consulta los tickets asignados a ti.</p>
-                    <a class="btn btn-primary"><i class="fas fa-search"></i> Ir</a>
+                    <a href="{{ url_for('consultar_tickets')}}" class="btn btn-primary"><i class="fas fa-search"></i> Ir</a>
                 </div>
             </div>
         </div>
