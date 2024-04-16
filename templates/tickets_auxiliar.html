@@ -145,6 +145,12 @@
   <!-- Script personalizado -->
 
   <script>
+
+    function goBack(){
+      window.history.back();
+
+    }
+    
     function checkOption(select) {
         var option = select.value;
         var numeroTicketInput = document.getElementById('numeroTicket');
@@ -205,6 +211,8 @@
 
         $('#comentariosModal').modal('show'); 
     }
+
+
 
 </script>
 
