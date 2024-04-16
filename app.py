@@ -295,7 +295,7 @@ def ver_tickets():
             t.Problema,
             t.Descripcion_problema,
             t.status,
-            t.Comentarios  
+            t.comentarios_cliente  
         FROM 
             tickets t
         JOIN 
@@ -609,7 +609,7 @@ def gestion_usuarios():
     #paso4 -> Cierro la consulta 
     cur.close()
 
-    print(f'datos enviados son: {clientes}')
+    #print(f'datos enviados son: {clientes}')
 
     cur = mysql.connection.cursor()
     cur.execute("SELECT idDepartamento , nombre_departamento from departamentos")
@@ -663,7 +663,7 @@ def editar_usuario(id_usuario):
     telefono = datos_usuario['telefono']
     contrasena = datos_usuario['contrasena']
     id_departamento = datos_usuario['id_departamento']
-    rol = datos_usuario['rol']  # Obtener el valor del campo de rol
+    rol = datos_usuario['rol']
 
     print(f"""Datos enviados al back end para editar el usuario con ID {id_usuario} son:\n
         nombre----->{nombre}
@@ -671,23 +671,62 @@ def editar_usuario(id_usuario):
         telefono--->{telefono}
         contrasena--->{contrasena}
         id_departamento---->{id_departamento}
-        rol----->{rol}
+        rol-----> {rol}
         """)
+
     nombre_completo = nombre.split()
-    nombre_pila = nombre_completo[0]
-    apellido_pat = nombre_completo[1]
-    apellido_mat = nombre_completo[2]
+    nombre_pila = nombre_completo[0] if len(nombre_completo) > 0 else ''
+    apellido_pat = nombre_completo[1] if len(nombre_completo) > 1 else ''
+    apellido_mat = nombre_completo[2] if len(nombre_completo) > 2 else ''
 
     numero = re.search(r'\b(\d+)\b', id_departamento).group(1)
     id_dpto = int(numero)
     print(f'numero -> {id_dpto}')
+    
     cursor = mysql.connection.cursor()
-    cursor.execute("UPDATE cliente SET nombre = %s, apellido_paterno = %s, apellido_materno = %s, correo_electronico = %s, telefono = %s, contrasena = %s, idDepartamento = %s, rol = %s WHERE id = %s",
-                    (nombre_pila, apellido_pat, apellido_mat, correo, telefono, contrasena, id_dpto, rol, id_usuario))  # Agregar el campo de rol a la consulta SQL
+    cursor.execute("""
+                    UPDATE cliente
+                    SET 
+                        nombre = %s,
+                        apellido_paterno = %s,
+                        apellido_materno = %s,
+                        telefono = %s,
+                        contrasena = %s,
+                        idDepartamento = %s,
+                        rol = %s
+                    WHERE idCliente = %s""",(nombre_pila, apellido_pat, apellido_mat, telefono, contrasena, id_dpto, rol, id_usuario))
     mysql.connection.commit()
     cursor.close()
 
     return jsonify({"message": "Usuario editado exitosamente"}), 200
+
+@app.route('/obtener_usuario/<int:id_usuario>', methods=['GET'])
+def obtener_usuario(id_usuario):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM cliente WHERE idCliente = %s", (id_usuario,))
+        usuario = cursor.fetchone()
+        cursor.close()
+        
+        if usuario:
+            usuario_dict = {
+                "id": usuario[0],
+                "nombre": usuario[1],
+                "apellido_paterno": usuario[2],
+                "apellido_materno": usuario[3],
+                "correo_electronico": usuario[4],
+                "telefono": usuario[5],
+                "contrasena": usuario[6],
+                "idDepartamento": usuario[7],
+                "rol": usuario[8]
+            }
+            return jsonify(usuario_dict), 200
+        else:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+
+    except Exception as e:
+        print(f"Error al obtener usuario: {e}")
+        return jsonify({"message": "Error al obtener usuario"}), 500
 
 
 @app.route('/eliminar_usuario/<int:idUsuario>', methods=['DELETE'])
