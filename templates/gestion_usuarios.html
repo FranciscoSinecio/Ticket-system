@@ -79,12 +79,13 @@
             {% for c in clientes%}
             <tr>
               <td>{{ c[1] }} {{ c[2]}} </td>
-              <td>{{ c[3] }}</td>
               <td>{{ c[4] }}</td>
+              <td>{{ c[5] }}</td>
               <td>{{ c[0] }}</td>
               <td>{{ c[8] }}</td>
               <td>
-                <button class="btn btn-primary" onclick="editarUsuario('{{ c[1] }} {{ c[2] }} {{ c[3] }}', '{{ c[4] }}', '{{ c[5] }}', '{{ c[7] }}', '{{ c[6] }}')">
+                <!--<button class="btn btn-primary" onclick="editarUsuario('{{ c[1] }} {{ c[2] }} {{ c[3] }}', '{{ c[4] }}', '{{ c[5] }}', '{{ c[7] }}', '{{ c[6] }}')">-->
+                  <button class="btn btn-primary" onclick="editarUsuario('{{ c[0] }}')">
                   <i class="fas fa-edit"></i> Editar
                 </button>
                 <button class="btn btn-danger" onclick="eliminarUsuario('{{ c[0] }}')">
@@ -113,6 +114,7 @@
         </div>
         <div class="modal-body">
           <form id="formUsuario">
+              <input type="hidden" id="id">
             <div class="form-group">
               <label for="nombreUsuario">Nombre de Usuario</label>
               <input type="text" class="form-control" id="nombreUsuario" placeholder="Nombre de Usuario">
@@ -137,14 +139,14 @@
               <select class="form-control" id="departamento">
                 {% for d in depart %}
                 <option>{{ d[0] }} - {{ d[1] }}</option>
-                {% endfor%}
+                {% endfor %}
               </select>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-          <button type="button" class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+          <button type="button" class="btn btn-primary" id="btnGuardarModal" onclick="guardarUsuario()">Guardar</button>
         </div>
       </div>
     </div>
@@ -169,198 +171,233 @@
   // Función para mostrar el formulario de crear o editar usuario
   function mostrarFormularioCrearUsuario(usuario) {
     if (usuario) {
-        // Editar usuario
-        $('#nombreUsuario').val(usuario.nombre);
-        $('#email').val(usuario.correo);
-        $('#telefono').val(usuario.telefono);
-        $('#contrasena').val(usuario.contrasena);
-        $('#departamento').val(usuario.id_departamento);
-        $('#rol').val(usuario.rol); // Asignar el valor del campo de rol
+        $('#nombreUsuario').val(usuario.nombre ? usuario.nombre : '');
+        $('#email').val(usuario.correo ? usuario.correo : '');
+        $('#telefono').val(usuario.telefono ? usuario.telefono : '');
+        $('#contrasena').val(usuario.contrasena ? usuario.contrasena : '');
+        $('#rol').val(usuario.rol ? usuario.rol : '');
+        $('#departamento').val(usuario.id_departamento ? usuario.id_departamento : '');
+        $('#id').val(usuario.id ? usuario.id : ''); // Actualizar el valor del campo oculto
+
         $('#formularioUsuario .modal-title').text('Editar Usuario');
+        $('#btnGuardarModal').text('Modificar');
+        $('#btnGuardarModal').off('click').on('click', function() {
+            modificarUsuario();
+        });
     } else {
-        // Crear nuevo usuario
+        // Resto del código para un nuevo usuario
         $('#nombreUsuario').val('');
         $('#email').val('');
         $('#telefono').val('');
         $('#contrasena').val('');
+        $('#rol').val('');
         $('#departamento').val('');
-        $('#rol').val(''); //Vaciar el campo de rol al crear un nuevo usuario
-        $('#formularioUsuario .modal-title').text('Crear Nuevo Usuario');
-    }
+        $('#id').val('');
 
+        $('#formularioUsuario .modal-title').text('Crear Nuevo Usuario');
+        $('#btnGuardarModal').text('Guardar');
+        $('#btnGuardarModal').off('click').on('click', function() {
+            guardarUsuario();
+        });
+    }
     // Mostrar el formulario
     $('#formularioUsuario').modal('show');
 }
 
-  // Función para guardar o editar el usuario
-  function guardarUsuario() {
+
+//Funcion para editar un usuario
+function editarUsuario(idUsuario) {
+    $.ajax({
+        type: 'GET',
+        url: '/obtener_usuario/' + idUsuario,
+        success: function(usuario) {
+            console.log('Datos del usuario', usuario);
+            $('#nombreUsuario').val(usuario.nombre);
+            $('#email').val(usuario.correo);
+            $('#telefono').val(usuario.telefono);
+            $('#contrasena').val(usuario.contrasena);
+            $('#rol').val(usuario.rol);
+            $('#departamento').val(usuario.id_departamento);
+            $('#id').val(usuario.id); // Actualizar el valor del campo oculto
+            
+            $('#formularioUsuario .modal-title').text('Editar Usuario');
+            $('#btnGuardarModal').text('Modificar');
+            $('#btnGuardarModal').off('click').on('click', function() {
+                modificarUsuario();
+            });
+
+            $('#formularioUsuario').modal('show');
+        },
+        error: function(error) {
+            console.error('Error al obtener el usuario:', error);
+            alert('Error al obtnener el usuario. Por favor, intenta nuevamente.');
+        }
+    });
+}
+
+function guardarUsuario() {
     var nombreUsuario = $('#nombreUsuario').val();
     var email = $('#email').val();
     var telefono = $('#telefono').val();
     var contrasena = $('#contrasena').val();
-    var idDepartamento = $('#departamento').val();
-    var rol = $("#rol").val() //Obtenemos el valor del campo del rol
-    var idUsuario = $('#id').val(); // Nuevo campo para almacenar el ID del usuario en edición
+    var rol = $("#rol").val();
+    var id_departamento = $('#departamento').val();
 
-    if (nombreUsuario && email && telefono && contrasena && idDepartamento && rol) {
-        var usuario = {
-            nombre: nombreUsuario,
-            correo: email,
-            telefono: telefono,
-            contrasena: contrasena,
-            id_departamento: idDepartamento,
-            rol: rol
-        };
-
-        if (idUsuario){
-          //si hay un id , estmos editanddo un usuario existente
-          usuario.id = idUsuario;
-          $.ajax({
-            type: 'PUT',
-            url: '/editar_usuario/' + idUsuario,
-            contentType: 'application/json',
-            data: JSON.stringify(usuario),
-            success: function(response){
-              console.log(response);
-              $('#formularioUsuario').modal('hide');
-              actualizarListaUsuarios();
-            },
-            error: function (error){
-              console.error('Error al editar el usuario:', error);
-            }
-
-          });
-        }else{
-          //si no existe un ID, significa que estamos creando un nuevo usuario
-          $.ajax({
-            type:'POST',
-            url:'/registrar_usuario',
-            contentType:'application/json',
-            data: JSON.stringify(usuario),
-            success: function (response){
-              console.log(response);
-              $('#formularioUsuario').modal('hide');
-              actualizarListaUsuarios();
-            },
-            error:function(error){
-              console.error('Error al guardar nuevo usuario', error);
-            }
-          });
-        }
-      } else{
-        alert('Por favor, completa todos los campos.');
-      }
-  }
-
-
-
-  // Función para buscar un usuario
-  function buscarUsuario() {
-    var busqueda = $('#busqueda').val().toLowerCase();
-
-    // Recorrer cada fila de la tabla de usuarios
-    $('#listaUsuarios tr').each(function() {
-      var nombreUsuario = $(this).find('td:nth-child(1)').text().toLowerCase();
-      var email = $(this).find('td:nth-child(2)').text().toLowerCase();
-      var telefono = $(this).find('td:nth-child(3)').text().toLowerCase();
-      var id = $(this).find('td:nth-child(4)').text().toLowerCase();
-      var departamento = $(this).find('td:nth-child(5)').text().toLowerCase();
-
-      // Verificar si el término de búsqueda coincide con algún campo del usuario
-      if (nombreUsuario.includes(busqueda) || email.includes(busqueda) || telefono.includes(busqueda) || id.includes(busqueda) || departamento.includes(busqueda)) {
-        // Mostrar la fila si coincide
-        $(this).show();
-      } else {
-        // Ocultar la fila si no coincide
-        $(this).hide();
-      }
-    });
-  }
-
-  // Función para editar un usuario
-  function editarUsuario(nombreUsuario, email, telefono, contrasena, idDepartamento, idUsuario, rol) {
     var usuario = {
         nombre: nombreUsuario,
         correo: email,
         telefono: telefono,
         contrasena: contrasena,
-        id_departamento: idDepartamento,
-        id: idUsuario, // Pasar el ID del usuario en edición
-        rol: rol // Pasar el rol del usuario en edición
+        rol: rol,
+        id_departamento: id_departamento
     };
-    mostrarFormularioCrearUsuario(usuario);
-}
 
-
-  // Función para eliminar un usuario
-  function eliminarUsuario(idUsuario) {
-    // Mostrar mensaje de confirmación
-    Swal.fire({
-      title: '¿Estás seguro de eliminar el usuario?',
-      text: '¡No podrás revertir esto!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminarlo!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Realizamos la solicitud de AJAX al backend para eliminar al usuario
-        $.ajax({
-          type: 'DELETE',
-          url: '/eliminar_usuario/' + idUsuario,
-          success: function(response) {
-            // Simular un retardo de 1 segundo antes de mostrar el Toast
-            setTimeout(function() {
-              // Lógica para mostrar el Toast de SweetAlert
-              const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener('mouseenter', Swal.stopTimer);
-                  toast.addEventListener('mouseleave', Swal.resumeTimer);
-                }
-              });
-              Toast.fire({
-                icon: 'success',
-                title: 'Usuario eliminado exitosamente'
-              });
-
-              // Después de mostrar el Toast, actualizamos la lista de usuarios
-              actualizarListaUsuarios();
-            }, 1000); // Simulando un retardo para la eliminación (1 segundo)
-          },
-          error: function(error) {
-            console.error('Error al eliminar el usuario:', error);
-            // Mostrar mensaje de error
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Hubo un error al eliminar el usuario. Por favor, intenta de nuevo más tarde.'
-            });
-          }
-        });
-      }
+    $.ajax({
+        type: 'POST',
+        url: '/registrar_usuario',
+        contentType: 'application/json',
+        data: JSON.stringify(usuario),
+        success: function(response) {
+            console.log(response);
+            $('#formularioUsuario').modal('hide');
+            actualizarListaUsuarios();
+        },
+        error: function(error) {
+            console.error('Error al guardar nuevo usuario', error);
+        }
     });
 }
 
 
-  // Función para actualizar la lista de usuarios
+// Función para modificar un usuario existente
+function modificarUsuario() {
+    var nombreUsuario = $('#nombreUsuario').val();
+    var email = $('#email').val();
+    var telefono = $('#telefono').val();
+    var contrasena = $('#contrasena').val();
+    var rol = $("#rol").val();
+    var id_departamento = $('#departamento').val();
+    var id = $('#id').val(); // Obtener el ID del usuario
+
+    var usuario = {
+        nombre: nombreUsuario,
+        correo: email,
+        telefono: telefono,
+        contrasena: contrasena,
+        rol: rol,
+        id_departamento: id_departamento,
+        id: id
+    };
+
+    $.ajax({
+        type: 'PUT',
+        url: '/editar_usuario/' + id,
+        contentType: 'application/json',
+        data: JSON.stringify(usuario),
+        success: function(response) {
+            console.log(response);
+            $('#formularioUsuario').modal('hide');
+            actualizarListaUsuarios();
+        },
+        error: function(error) {
+            console.error('Error al editar el usuario:', error);
+        }
+    });
+}
+
+// Función para actualizar la lista de usuarios
 function actualizarListaUsuarios() {
-    // Aquí colocas la lógica para actualizar la lista de usuarios
-    // Por ejemplo, podrías hacer una nueva solicitud AJAX para obtener la lista actualizada
     $.ajax({
         type: 'GET',
-        url: '/obtener_usuarios', // Ruta para obtener la lista de usuarios
+        url: '/obtener_usuarios',
         success: function(response) {
-            // Actualizar el contenido de la tabla de usuarios con la respuesta del servidor
-            $('#listaUsuarios').html(response);
+            // Convertir la respuesta JSON a HTML y actualizar la lista de usuarios
+            var html = '';
+            response.forEach(function(usuario) {
+                html += '<tr>';
+                html += '<td>' + usuario.nombre + ' ' + usuario.apellido_paterno + ' ' + usuario.apellido_materno + '</td>';
+                html += '<td>' + usuario.correo_electronico + '</td>';
+                html += '<td>' + usuario.telefono + '</td>';
+                html += '<td>' + usuario.idCliente + '</td>';
+                html += '<td>' + usuario.idDepartamento + '</td>';
+                html += '<td>';
+                html += '<button class="btn btn-primary" onclick="editarUsuario(' + usuario.idCliente + ')"><i class="fas fa-edit"></i> Editar</button>';
+                html += '<button class="btn btn-danger" onclick="eliminarUsuario(' + usuario.idCliente + ')"><i class="fas fa-trash-alt"></i> Borrar</button>';
+                html += '</td>';
+                html += '</tr>';
+            });
+            $('#listaUsuarios').html(html);
         },
         error: function(error) {
             console.error('Error al obtener la lista de usuarios:', error);
+        }
+    });
+}
+
+// Función para buscar un usuario
+function buscarUsuario() {
+    var busqueda = $('#busqueda').val().toLowerCase();
+
+    $('#listaUsuarios tr').each(function() {
+        var nombreUsuario = $(this).find('td:nth-child(1)').text().toLowerCase();
+        var email = $(this).find('td:nth-child(2)').text().toLowerCase();
+        var telefono = $(this).find('td:nth-child(3)').text().toLowerCase();
+        var id = $(this).find('td:nth-child(4)').text().toLowerCase();
+        var departamento = $(this).find('td:nth-child(5)').text().toLowerCase();
+
+        if (nombreUsuario.includes(busqueda) || email.includes(busqueda) || telefono.includes(busqueda) || id.includes(busqueda) || departamento.includes(busqueda)) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+}
+
+// Función para eliminar un usuario
+function eliminarUsuario(idUsuario) {
+    // Preguntar al usuario si realmente desea eliminar el usuario
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Si el usuario confirma, proceder con la eliminación
+            $.ajax({
+                type: 'DELETE',
+                url: '/eliminar_usuario/' + idUsuario,
+                success: function(response) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer);
+                            toast.addEventListener('mouseleave', Swal.resumeTimer);
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Usuario eliminado exitosamente'
+                    });
+                    actualizarListaUsuarios();
+                },
+                error: function(error) {
+                    console.error('Error al eliminar el usuario:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el usuario. Por favor, intenta de nuevo más tarde.'
+                    });
+                }
+            });
         }
     });
 }
