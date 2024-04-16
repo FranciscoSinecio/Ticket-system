@@ -94,12 +94,12 @@
       </td>    
       <td><button class="btn btn-primary" onclick="actualizarTicket('{{ ticket[0] }}','{{ticket[7] }} ')">Actualizar</button></td>
       <td>
-        {% if elemento.8 %}
-            <button class="btn btn-info" onclick="mostrarComentarios('{{ elemento.8 }}')">Ver comentarios</button>
+        {% if ticket[8] %}
+            <button class="btn btn-info" onclick="mostrarComentarios('{{ ticket[8] }}')">Ver comentarios</button>
         {% else %}
             <p>No hay comentarios</p>
         {% endif %}
-      </td>
+    </td>
     </tr>
   {% endfor %}
   </tbody>

@@ -1033,6 +1033,36 @@ def auxiliar():
 
     return render_template('panel_auxiliar.html',datos = auxiliar_data, id_personal=id_personal)
 
+@app.route('/consultar_tickets')
+def consultar_tickets():
+    id_cliente = session.get('id', None)
+    query = """
+        SELECT 
+            t.id_ticket,
+            c.nombre AS nombre_cliente,
+            c.apellido_paterno AS apellido_paterno_cliente,
+            d.nombre_departamento,
+            t.fecha_expedicion,
+            t.Problema,
+            t.Descripcion_problema,
+            t.status,
+            t.comentarios_auxiliar 
+        FROM 
+            tickets t
+        JOIN 
+            cliente c ON t.idCliente = c.idCliente
+        JOIN
+            departamentos d ON c.idDepartamento = d.idDepartamento
+        WHERE
+            t.idAuxiliar = %s
+        ORDER BY t.id_ticket DESC;
+    """
+    cur = mysql.connection.cursor()
+    cur.execute(query, (id_cliente,))
+    tickets = cur.fetchall()
+    cur.close()
+    print(f'info enviada al front end {tickets}')
+    return render_template('tickets_auxiliar.html', tickets=tickets)
 
 if __name__ =='__main__':
     app.run(debug = True )

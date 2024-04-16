@@ -75,10 +75,10 @@ body {
     margin-top: 20px;
 }
 
-.float-right {
+.float-left {
     position: fixed;
     top: 20px;
-    right: 20px;
+    left: 20px;
 }
 
 .organization-container img {
@@ -87,7 +87,6 @@ body {
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
 }
-
 .footer {
     text-align: center;
     color: #ffffff;
@@ -103,5 +102,11 @@ body {
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+.logout {
+    position: fixed;
+    top: 50px; /* Distancia desde el borde superior */
+    right: 40px; /* Distancia desde el borde derecho */
+    z-index: 999; /* Asegura que esté por encima de otros elementos */
+}
 
 
