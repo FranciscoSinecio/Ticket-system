@@ -69,13 +69,13 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     position: absolute;
-    left: 100px; /* Ajustar la posición del botón de regresar hacia la izquierda */
+    left: 30px; /* Ajustar la posición del botón de regresar hacia la izquierda */
     top: 50%;
     transform: translateY(-50%);
   }
   
   .btn-link:hover {
-    background-color: #2980b9; /* Cambia el color al pasar el ratón */
+    background-color: #ffffff; /* Cambia el color al pasar el ratón */
     text-decoration: none;
   }
   
