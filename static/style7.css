@@ -50,6 +50,8 @@
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    flex: 1; /* Hace que las columnas se expandan para ocupar todo el espacio disponible */
+    margin: 20px; /* Agrega un margen entre los contenedores */
   }
   
   
@@ -136,6 +138,13 @@
 /* Ajustar el margen de la fila para alinearla correctamente */
 .rowe {
   margin-right: 700px; 
+  display: flex; /* Cambia la visualización a flexbox para alinear las columnas */
+  justify-content: space-between; /* Alinea las columnas horizontalmente */
+  margin: 0 auto; /* Centra la fila */
+}
+
+.card {
+  height: 100%; /* Asegura que todas las tarjetas tengan la misma altura */
 }
 
 .style3 {
@@ -175,3 +184,5 @@
   left: 530px;
   z-index: 1001; /* Asegura que esté encima del botón de descarga */
 }
+
+
