@@ -18,13 +18,11 @@
 
 
     {% block content %}
-        <!-- Header -->
-        
         <header class="header">
             <div class="row">
             <div class="col">
                 <button class="btn btn-link btn-lg" onclick="goBack()">
-                    <i class="fas fa-home"></i> 
+                <i class="fas fa-home"></i> 
                 </button>
             </div>
             <div class="col text-center">
@@ -36,14 +34,14 @@
             </div>
         </header>
 
-        <!-- nav -->
+         <!-- nav -->
         <nav class="navbar navbar-custom">
-        <div></div>
-        <div class="nav-btns">
+            <div></div>
+            <div class="nav-btns">
             <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
-            <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultar_tickets"><i class="fas fa-list-alt"></i> Tickets Asignados</a>
-            <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
-        </div>
+            <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/solicitar_ticket"><i class="fas fa-list-alt"></i> Solicitar Ticket</a>
+            <a id="reportesBtn" class="btn btn-outline-warning" href="/ver_tickets"><i class="fas fa-chart-bar"></i> Mis Tickets</a>
+            </div>
         </nav>
 
         <!-- Contenido principal -->
@@ -51,8 +49,11 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="profile-container text-center">
-                        <!-- Aplica el estilo a la imagen de perfil -->
-                        <img src="{{ url_for('static', filename='photos_profile/1202125.png') }}" alt="User Photo" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+                    {% if datos.id is defined %}
+                        <img src="{{ url_for('static', filename='photos_profile/' + datos.id|string + '.png') }}" alt="User Photo" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='photos_profile/default.png') }}" alt="User Photo" class="img-fluid rounded-circle mb-3 profile-image current-photo">
+                    {% endif %}
                         <h2> {{ datos.nombre }} {{datos.ap_paterno}} {{datos.ap_materno}} </h2>
                         <p>Email: {{ datos.email }}</p>
                         <p>Teléfono: {{ datos.telefono }}</p>
@@ -82,7 +83,7 @@
                         <button type="button" class="close" onclick="closeEditModal()">&times;</button>
                     </div>
                     <!-- Form for editing profile details -->
-                    <form action="{{ url_for('admin_cliente') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ url_for('actualizar_perfil') }}" method="POST" enctype="multipart/form-data">
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="photo">Cambiar Foto de Usuario:</label>
@@ -161,6 +162,32 @@
             <script src="{{ url_for('static', filename='admincliente.js') }}"></script>
             
             <script>
+
+                function confirmProfileChanges(){
+                    var formData = new FormData(document.querySelector('form'));
+                    fetch('/actualizar_perfil', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === 'Perfil actualizado con éxito'){
+                            alert('¡Perfil actualizado  éxitosamente !');
+                            closeEditModal();
+                            location.reload(); //Recargamos la pagina para la foto
+                        } else {
+                            alert('¡Error!, no se pudo actualizar el pefil');
+                        }
+                    })
+                    .catch((error) =>{
+                        console.error('Error:', error);
+                    });
+                }
+
+                function closeEditModal(){
+                    document.getElementById('editModal').style.display = 'none';
+                }
+
                 function confirmPasswordChange(){
                     var passwordActual = document.getElementById('current_password').value;
                     var passwordNuevo = document.getElementById('new_password').value;

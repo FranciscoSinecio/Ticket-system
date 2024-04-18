@@ -64,7 +64,7 @@
     padding: 8px 16px;
     color: #fff;
     font-size: 16px;
-    margin-right: 300px; /* Ajuste para acercar el botón a la izquierda */
+    margin-right: 350px; /* Ajuste para acercar el botón a la izquierda */
     background-color: var(--primary-color); /* Resalta el botón de regresar */
     border: none;
     border-radius: 5px;
@@ -146,5 +146,13 @@
     color:#000000
   }
   
+  /* Estilo para el icono */
+  .filtro-fecha i {
+    color: black; /* Cambia el color del icono a negro */
+}
 
-  
+/* Estilo para el título de fecha */
+.filtro-fecha label {
+    color: black; /* Cambia el color del texto a negro */
+    font-weight: bold; /* Opcional: Aplica negrita al texto */
+}
