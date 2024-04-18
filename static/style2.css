@@ -77,7 +77,7 @@ button.btn-link {
 }
 
 button.btn-link:hover {
-  background-color: #2980b9; /* Cambia el color al pasar el ratón */
+  background-color: #ffffff; /* Cambia el color al pasar el ratón */
   text-decoration: none;
 }
 
