@@ -1116,6 +1116,58 @@ def auxiliar():
 
     return render_template('panel_auxiliar.html',datos = auxiliar_data, id_personal=id_personal)
 
+@app.route('/admin_auxiliar', methods=('GET','POST'))
+def admin_auxiliar():
+    if request.method == 'POST':
+        
+        id_personal = session.get('id', None)
+        nombre = request.form['name']
+        email = request.form['email']
+        telefono = request.form['phone']
+        departamento = request.form['department']
+
+        cur = mysql.connection.cursor()
+
+        #actualización de la base de datos
+
+        cur.execute('UPDATE cliente SET nombre = %s, correo_electronico = %s, telefono = %s, departamento = %s WHERE idCliente =%s',
+                    (nombre, email, telefono, departamento, id_personal))
+        
+        #ejecutamos la sentencia de mysql
+
+        mysql.connection.commit()
+        cur.close()
+
+        #Actualizamos los datos de la sesion de usuario 
+
+        session['nombre_sh'] = nombre
+        session['email'] = email
+        session['telefono'] = telefono
+        session['depto'] = departamento
+
+        return redirect(url_for('panel_cliente'))
+    
+    else:
+
+        id_personal = session.get('id', None)
+        nombre = session.get('nombre_sh', None)
+        ap_paterno = session.get('ap_pat', None)
+        ap_materno = session.get('ap_mat', None)
+        email = session.get('email', None)
+        telefono = session.get('telefono', None)
+        departamento = session.get('depto', None)
+        datos = {
+            'id': id_personal,
+            'nombre': nombre,
+            'ap_paterno': ap_paterno,
+            'ap_materno': ap_materno,
+            'email': email,
+            'telefono': telefono,
+            'departamento': departamento
+        }
+
+        return render_template('adminauxiliar.html', datos=datos)
+
 @app.route('/consultar_tickets')
 def consultar_tickets():
     id_cliente = session.get('id', None)

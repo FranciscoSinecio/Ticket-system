@@ -26,7 +26,7 @@ function confirmProfileChanges() {
     })
     .then(response => {
         if (!response.ok){
-            throw new Error('Hobo un problema al guardar los cambios.');
+            throw new Error('Hubo un problema al guardar los cambios.');
         }
         //si la respuesta es exitosa, mostrar un mensaje y recargar la pagina
         alert('¡Los cambios se han guardado exitosamente!');
