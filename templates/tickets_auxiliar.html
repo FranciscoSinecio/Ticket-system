@@ -141,6 +141,60 @@
     </div>
   </div>
 
+  <!-- Enlace para abrir el modal -->
+  <a href="#mostrarModalComentarios" data-toggle="modal"></a>
+
+  <!-- Modal para comentarios u observaciones -->
+  <div class="modal fade" id="mostrarModalComentarios" tabindex="-1" role="dialog" aria-labelledby="mostrarModalComentariosomentariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mostrarModalComentarios">Enviar Comentarios</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Un solo formulario que contiene todos los campos -->
+          <form id="form-comentarios">
+            <div class="form-group">
+              <label for="tipoUsuario">Seleccione el tipo de usuario:</label>
+              <select class="form-control" id="tipoUsuario">
+                <option value="cliente_aux">Cliente</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ticket">Seleccione o ingrese el número de ticket:</label>
+              <select class="form-control" id="ticket" onchange="checkOption(this)">
+                  <option value="">Seleccionar</option>
+                  {% for ticket in tickets %}
+                    <option value="{{ ticket[0] }}">{{ ticket [0] }} - {{ ticket[5] }}</option>
+                  {% endfor %}
+                  
+              </select>
+              <input type="text" class="form-control mt-2" id="numeroTicket" placeholder="Ingresar número de ticket" style="display:none;">
+              <input type="hidden" id="id_ticket" name="id_ticket" value="">
+            </div>
+
+            <!-- Campo para ingresar comentarios -->
+            <div class="form-group">
+              <label for="comentarios">Comentarios/Observaciones:</label>
+              <textarea class="form-control" id="comentarios" name="comentarios" rows="3"></textarea>
+            </div>
+            <!--Campos ocultos para TipoUsuario e Id_ticket-->
+            <input type="hidden" id="hiddenTipoUsuario" name="tipoUsuario" value="">
+            <input type="hidden" id="hiddenIdTicket" name="id_ticket" value="">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="enviarComentarios()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="row">
       <div class="col-md-6 text-left">
@@ -259,11 +313,61 @@ function cargarTicketsFiltrados() {
 <script>
   function mostrarModalComentarios(ticketId) {
     // Muestra el modal de comentarios
-    $('#comentariosModal').modal('show');
+    $('#mostrarModalComentarios').modal('show');
     // Aquí puedes realizar acciones adicionales si es necesario, como cargar los comentarios del ticket seleccionado, etc.
   }
 </script>
 
+<script>
+  function enviarComentarios() {
+    // Obtener el número de ticket seleccionado o ingresado manualmente
+    var ticket = document.getElementById('ticket').value;
+    if (ticket === 'ingresar') {
+        ticket = document.getElementById('numeroTicket').value;
+    }
+
+    // Obtener los comentarios
+    var comentarios = document.getElementById('comentarios').value;
+
+    // Obtener el tipo de usuario seleccionado
+    var tipoUsuario = document.getElementById('tipoUsuario').value;
+
+    // Establecer los valores en los campos ocultos
+    document.getElementById('hiddenIdTicket').value = ticket;
+    document.getElementById('hiddenTipoUsuario').value = tipoUsuario;
+
+    // Crear un objeto con los datos a enviar al servidor
+    var datos = {
+        id_ticket: ticket,
+        tipoUsuario: tipoUsuario,
+        comentarios: comentarios
+    };
+
+    // Enviar los datos al servidor mediante AJAX
+    fetch('/comentarios', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => {
+        if (response.ok) {
+            // Los comentarios se enviaron correctamente
+            alert('Comentarios enviados correctamente');
+            // Recargar la página para ver los cambios
+            window.location.reload();
+        } else {
+            // Error al enviar los comentarios
+            alert('Error al enviar los comentarios. Por favor, inténtalo de nuevo.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error al enviar los comentarios. Por favor, verifica tu conexión o inténtalo de nuevo más tarde.');
+    });
+  }
+</script>
 
 </body>
 </html>

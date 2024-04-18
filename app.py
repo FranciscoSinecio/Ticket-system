@@ -541,6 +541,16 @@ def comentarios():
                         (comentarios,id_ticket))
             mysql.connection.commit()
             cur.close()
+        elif tipoUsuario == 'cliente_aux':
+            cur = mysql.connection.cursor()
+            cur.execute("""
+                        UPDATE tickets
+                        SET comentarios_aux_cliente = %s
+                        WHERE id_ticket = %s""",
+                        (comentarios,id_ticket))
+            mysql.connection.commit()
+            cur.close()
+
 
         return jsonify({"message": "Comentarios guardados correctamente"}, 200)
     
