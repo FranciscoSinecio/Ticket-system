@@ -115,40 +115,52 @@ panel_jefe
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    $(document).ready(function(){
-        $("#logoutBtn").click(function(e){
-            e.preventDefault();
-            
-            Swal.fire({
-                title: "¿Estás seguro de querer salir de la aplicación?",
-                text: "No podrás revertir esta acción",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Sí, salir"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/',
-                        type: 'POST',
-                        data: {'action': 'logout'},
-                        success: function(response){
+  $(document).ready(function(){
+    $("#logoutBtn").click(function(e){
+        e.preventDefault();
+        console.log("Boton de logout presionado");
+        
+        Swal.fire({
+            title: "¿Estás seguro de querer salir de la aplicación?",
+            text: "No podrás revertir esta acción",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Sí, salir"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/',
+                    type: 'POST',
+                    data: {'action': 'logout'},
+                    success: function(response){
+                        console.log(response);  // Verificar la respuesta del backend
+                        if(response.status === 'success'){
                             Swal.fire({
                                 title: "¡Desconectado!",
                                 text: "Has cerrado sesión exitosamente.",
                                 icon: "success"
                             }).then(() => {
+                                console.log("Redirigir a la página principal");  // Verificar la redirección
                                 window.location.href="/";
                             });
-                        },
-                        error: function(error){
-                            console.log("Error:", error);
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: response.message,
+                                icon: "error"
+                            });
                         }
-                    });
-                }
-            });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        console.log("Error en AJAX:", textStatus, errorThrown);
+                    }
+                });
+            }
         });
     });
+});
 </script>
+
 {% endblock %}

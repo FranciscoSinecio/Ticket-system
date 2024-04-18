@@ -44,7 +44,7 @@
    <nav class="navbar navbar-custom">
     <div></div>
     <div class="nav-btns">
-      <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile"><i class="fas fa-user"></i> Administrar Perfil</a>
+      <a id="editProfileBtn" class="btn btn-outline-primary" href="/edit_profile_jefe"><i class="fas fa-user"></i> Administrar Perfil</a>
       <a id="consultarTicketsBtn" class="btn btn-outline-info" href="/consultaJefeTicket"><i class="fas fa-list-alt"></i> Consultar Tickets</a>
       <a id="reportesBtn" class="btn btn-outline-warning" href="/reportes"><i class="fas fa-chart-bar"></i> Reportes</a>
       <a id="departamentosBtn" class="btn btn-outline-success" href="/departamentos"><i class="fas fa-building"></i> Departamentos</a>
@@ -147,16 +147,16 @@
         // Verificar si el tipo de reporte es 'Fechas' antes de solicitar la fecha
         if (reportType === 'Fechas') {
             const selectedDate = document.getElementById("fechaSeleccionada").value;
+            const [mes, anio] = selectedDate.split('-');
 
-            // Validar que se haya seleccionado una fecha
-            if (selectedDate === "") {
+            if (!mes || !anio) {
                 alert("Por favor seleccione una fecha.");
                 return;
             }
 
             // Envía la fecha seleccionada al backend junto con el tipo de reporte
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/generar_pdf/' + reportType + '?fecha=' + selectedDate, true);
+            xhr.open('GET', `/generar_pdf/${reportType}?mes=${mes}&anio=${anio}`, true);
             xhr.responseType = 'blob';
             xhr.onload = function () {
                 if (this.status === 200) {
@@ -208,6 +208,7 @@
         }
     }
 
-  </script>
+</script>
+
 </body>
 </html>

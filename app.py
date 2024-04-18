@@ -41,10 +41,17 @@ def configure_row_factory():
 def index():
     return render_template('login.html')
 
-@app.route('/',methods=['POST'])
+@app.route('/', methods=['POST'])
 def logout():
-    return redirect(url_for('index'))
-
+    try: 
+        if 'user_id' in session:
+            session.pop('user_id', None)
+            return jsonify({'status': 'success', 'message': 'Sesión cerrada exitosamente'})
+        else:
+            return jsonify({'status': 'error', 'message': 'No hay sesión activa'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+    
 @app.route('/panel_cliente')
 def panel_cliente():
     id_cliente = session.get('id', None)
@@ -845,9 +852,13 @@ def generar_pdf(reportType):
         pdf_path = generar_pdf_dptos()
 
     elif reportType == "Fechas":
-        fecha_inio = request.args.get('start')
-        fecha_fin = request.args.get('end')
-        direccion_pdf = generar_pdf_fechas(fechas_inicio, fechas_fin)
+        mes = request.args.get('mes')
+        anio = request.args.get('anio')
+        if mes == None or anio == None:
+            return jsonify({"error": "Mes y año son obligatorios"}), 400
+        
+        # Aquí se genera el contenido del PDF de reporte de fechas
+        pdf_path = generar_pdf_fechas(mes, anio)
     else:
         return jsonify({"error": "Tipo de reporte no valido"}), 400
     
@@ -1041,7 +1052,7 @@ def generar_pdf_dptos():
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-def generar_pdf_fechas(fecha_inicio, fecha_fin):
+def generar_pdf_fechas(mes, año):
 
     path_to_wkhtmltopdf =  r"C:\Program Files\wkhtmltopdf\bin"
     path_to_executable = os.path.join(path_to_wkhtmltopdf, "wkhtmltopdf.exe")
@@ -1068,11 +1079,11 @@ def generar_pdf_fechas(fecha_inicio, fecha_fin):
                 LEFT JOIN 
                     cliente a ON t.idAuxiliar = a.idCliente AND a.rol = 'auxiliar'
                 WHERE
-                    t.fecha_expedicion BETWEEN %s AND %s
+                    MONTH(t.fecha_expedicion) = %s AND YEAR(t.fecha_expedicion) = %s
                 """
-    cur.execute(consulta, (fecha_inicio, fecha_fin))
+    cur.execute(consulta, (mes, año))
     data = cur.fetchall()
-    cur.close
+    cur.close()
     
     fecha_formato = datetime.now().strftime('%Y-%m-%d')
     
