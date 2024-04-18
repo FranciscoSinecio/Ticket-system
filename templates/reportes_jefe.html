@@ -108,74 +108,7 @@
   
   <!-- Script personalizado -->
   <script>
-<<<<<<< HEAD
 
-let isPopupOpen = false;
-
-function openPopup(reportType) {
-  const popup = document.getElementById("popup");
-  
-  if (!isPopupOpen) {
-    popup.classList.add("show-popup");
-    isPopupOpen = true;
-  } else {
-    popup.classList.remove("show-popup");
-    isPopupOpen = false;
-  }
-
-  const downloadBtn = document.getElementById("downloadBtn");
-  downloadBtn.dataset.reportType = reportType;
-}
-
-function downloadPDF() {
-  // Obtener el tipo de reporte seleccionado del atributo data-reportType del botón de descarga
-  const reportType = document.getElementById("downloadBtn").dataset.reportType;
-
-  // Crear una nueva solicitud XMLHttpRequest
-  var xhr = new XMLHttpRequest();
-
-  // Configurar la solicitud GET con la URL correspondiente al tipo de reporte seleccionado
-  xhr.open('GET', '/generar_pdf/' + reportType, true);
-
-  // Especificar que se espera una respuesta en formato JSON
-  xhr.responseType = 'json';
-
-  // Definir lo que se debe hacer cuando la solicitud se complete
-  xhr.onload = function() {
-    // Verificar si la solicitud fue exitosa (estado 200)
-    if (this.status === 200) {
-      // Verificar si la respuesta es un objeto JSON válido
-      if (typeof this.response === 'object') {
-        // Obtener la ruta del archivo del objeto de respuesta
-        const filePath = this.response.filePath;
-        // Mostrar un mensaje de alerta con la ruta del archivo
-        alert('El reporte se generó correctamente y se guardó en: ' + filePath);
-      } else {
-        // Si la respuesta no es un objeto JSON válido, mostrar un mensaje de error
-        console.error('Error al generar el PDF: la respuesta del servidor no es un objeto JSON válido');
-        alert('Error al generar el PDF. Por favor, intenta nuevamente.');
-      }
-    } else {
-      // Si la solicitud no fue exitosa, mostrar un mensaje de error
-      console.error('Error al generar el PDF');
-      alert('Error al generar el PDF. Por favor, intenta nuevamente.');
-    }
-  };
-
-  // Definir lo que se debe hacer en caso de error de red
-  xhr.onerror = function() {
-    console.error('Error de red al generar el PDF');
-    alert('Error de red al generar el PDF');
-  };
-
-  // Enviar la solicitud
-  xhr.send();
-}
-
-
-</script>  
-  
-=======
     let isPopupOpen = false;
 
     function openPopup(reportType) {
@@ -275,9 +208,6 @@ function downloadPDF() {
         }
     }
 
-</script>
-
-
->>>>>>> 0c257a5a43c2ab3234dea1af8e91c1308298549c
+  </script>
 </body>
 </html>

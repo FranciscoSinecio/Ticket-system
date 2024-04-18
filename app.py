@@ -92,6 +92,28 @@ def admin_cliente():
 
     return render_template(('admincliente.html'),datos = datos)
 #----------------------------------------------------------------------------------------------
+@app.route('/admin_jefe')
+def admin_jefe():
+    id_personal = session.get('id', None)
+    nombre = session.get('nombre_sh', None)
+    ap_paterno = session.get('ap_pat', None)
+    ap_materno = session.get('ap_mat', None)
+    email = session.get('email', None)
+    telefono = session.get('telefono', None)
+    departamento = session.get('depto', None)
+
+    datos = {
+        'id' : id_personal,
+        'nombre' : nombre,
+        'ap_paterno' : ap_paterno,
+        'ap_materno' : ap_materno,
+        'email': email,
+        'telefono' : telefono,
+        'dpto' : departamento
+    }
+
+    return render_template(('adminjefe.html'),datos = datos)
+
 # -> 15/02/2024
 
 @app.route('/edit_profile', methods=('GET','POST'))
@@ -146,6 +168,58 @@ def edit_profile():
 
         return render_template('admincliente.html', datos=datos)
     
+@app.route('/edit_profile_jefe', methods=('GET','POST'))
+def edit_profile_jefe():
+    if request.method == 'POST':
+        
+        id_personal = session.get('id', None)
+        nombre = request.form['name']
+        email = request.form['email']
+        telefono = request.form['phone']
+        departamento = request.form['department']
+
+        cur = mysql.connection.cursor()
+
+        #actualización de la base de datos
+
+        cur.execute('UPDATE cliente SET nombre = %s, correo_electronico = %s, telefono = %s, departamento = %s WHERE idCliente =%s',
+                    (nombre, email, telefono, departamento, id_personal))
+        
+        #ejecutamos la sentencia de mysql
+
+        mysql.connection.commit()
+        cur.close()
+
+        #Actualizamos los datos de la sesion de usuario 
+
+        session['nombre_sh'] = nombre
+        session['email'] = email
+        session['telefono'] = telefono
+        session['depto'] = departamento
+
+        return redirect(url_for('panel_cliente'))
+    
+    else:
+
+        id_personal = session.get('id', None)
+        nombre = session.get('nombre_sh', None)
+        ap_paterno = session.get('ap_pat', None)
+        ap_materno = session.get('ap_mat', None)
+        email = session.get('email', None)
+        telefono = session.get('telefono', None)
+        departamento = session.get('depto', None)
+        datos = {
+            'id': id_personal,
+            'nombre': nombre,
+            'ap_paterno': ap_paterno,
+            'ap_materno': ap_materno,
+            'email': email,
+            'telefono': telefono,
+            'departamento': departamento
+        }
+
+        return render_template('adminjefe.html', datos=datos)
+
 
 @app.route('/login',methods=["GET","POST"])
 def login():
@@ -681,7 +755,7 @@ def editar_usuario(id_usuario):
 
     numero = re.search(r'\b(\d+)\b', id_departamento).group(1)
     id_dpto = int(numero)
-    print(f'numero -> {id_dpto}')
+    #print(f'numero -> {id_dpto}')
     
     cursor = mysql.connection.cursor()
     cursor.execute("""
@@ -755,27 +829,29 @@ def generar_pdf(reportType):
 
     report_type_valor = reportType
 
-    print(f"El valor impreso de report type es ---> {report_type_valor}")
+    #print(f"El valor impreso de report type es ---> {report_type_valor}")
     # Lógica para generar el contenido del PDF
     if reportType == "Tickets":
         # Aquí se genera el contenido del PDF de reporte de tickets
-        generar_pdf_tickets()
-        return send_file('Reporte_tickets.pdf', as_attachment=True)
+        pdf_path = generar_pdf_tickets()
+        
     
     elif reportType == "Auxiliares":
         # Aquí se genera el contenido del PDF de reporte de auxiliares
-        direccion_pdf = generar_pdf_auxiliar()
+        pdf_path = generar_pdf_auxiliar()
     
     elif reportType == "Departamentos":
         # Aquí se genera el contenido del PDF de reporte de departamentos
-        direccion_pdf = generar_pdf_dptos()
+        pdf_path = generar_pdf_dptos()
 
     elif reportType == "Fechas":
         fecha_inio = request.args.get('start')
         fecha_fin = request.args.get('end')
         direccion_pdf = generar_pdf_fechas(fechas_inicio, fechas_fin)
     else:
-        return "Tipo de reporte no válido"
+        return jsonify({"error": "Tipo de reporte no valido"}), 400
+    
+    return jsonify({"filePath": pdf_path}), 200
     
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& FUnciones para hacer los pdf's&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&    
@@ -816,11 +892,15 @@ def generar_pdf_tickets():
     #obtenemos la fecha actual
     fecha_now = datetime.now().date()
     fecha_formato = fecha_now.strftime("%Y-%m-%d")
-    print(fecha_formato)
-    print (data) #Borrar cuando veas que te ha enviado
+    #print(fecha_formato)
+    #print (data) #Borrar cuando veas que te ha enviado
     html = render_template('template1_topdf.html', data = data, fecha_formato=fecha_formato)
-    print (html)
+    #print (html)
     pdfkit.from_string(html,'Reporte_tickets.pdf', configuration = config)
+    
+    pdf_path = os.path.join(os.getcwd(), 'Reporte_tickets.pdf')
+    
+    return pdf_path
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     
@@ -884,6 +964,7 @@ def generar_pdf_auxiliar():
                             auxiliares=auxiliares)
     
     pdfkit.from_string(html, 'Reporte_auxiliares_jefe.pdf', configuration=config)
+    
     pdf_path = os.path.join(os.getcwd(), 'Reporte_auxiliares_jefe.pdf')
 
     return pdf_path
@@ -920,7 +1001,7 @@ def generar_pdf_dptos():
     cur.execute(consult)
     departamentos_data = cur.fetchall()
     cur.close()
-    print(f'esta es la info de la base de datos obtenida---->{departamentos_data}')
+    #print(f'esta es la info de la base de datos obtenida---->{departamentos_data}')
     departamentos= {}
 
     for cliente in departamentos_data:
@@ -953,7 +1034,9 @@ def generar_pdf_dptos():
                             nombre_jefe = nombre_jefe,
                             departamentos = departamentos)
     pdfkit.from_string(html,'Reporte_dptos_jefe.pdf',configuration=config)
+    
     pdf_path = os.path.join(os.getcwd(),'Reporte_dptos_jefe.pdf')
+    
     return pdf_path
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
