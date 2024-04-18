@@ -146,5 +146,13 @@
     color:#000000
   }
   
+  /* Estilo para el icono */
+  .filtro-fecha i {
+    color: black; /* Cambia el color del icono a negro */
+}
 
-  
+/* Estilo para el título de fecha */
+.filtro-fecha label {
+    color: black; /* Cambia el color del texto a negro */
+    font-weight: bold; /* Opcional: Aplica negrita al texto */
+}

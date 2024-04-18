@@ -49,10 +49,21 @@
   </nav>
   
 
-  <!-- Contenido principal -->
   <div class="container mt-4">
-   <div class="table-wrapper">
-    <table class="table table-striped">
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-4 filtro-fecha">
+            <label for="fecha">
+                <i class="fas fa-filter"></i> <!-- Icono para filtrar -->
+                Fecha
+            </label>
+            <input type="date" id="fecha" class="form-control" onchange="cargarTicketsFiltrados()">
+
+        </div>
+    </div>
+    <div class="table-wrapper">
+      <table id="tablaTickets" class="table table-striped">
+        <!-- Contenido de la tabla aquí -->
       <thead>
         <tr>
           <th>N°ticket</th>
@@ -64,7 +75,8 @@
           <th>Status</th>
           <th>Modificar Status</th>
           <th>Actualizar</th>
-          <th>Comentarios</th>
+          <th>Comentarios recibidos</th>
+          <th>Enviar comentarios</th>
         </tr>
       </thead>
       <tbody>
@@ -88,6 +100,7 @@
             <option value="">Asignado</option>
             <option value="En Progreso">En Progreso</option>
             <option value="Completado">Completado</option>
+            <option value="No solucionado">Nunca Solucionado</option>
           </select>
 
         {% endif %}
@@ -100,6 +113,7 @@
             <p>No hay comentarios</p>
         {% endif %}
     </td>
+    <td><button class="btn btn-success" onclick="mostrarModalComentarios('{{ ticket[0] }}')">Comentarios</button></td>
     </tr>
   {% endfor %}
   </tbody>
@@ -211,10 +225,54 @@
 
         $('#comentariosModal').modal('show'); 
     }
+</script>
 
+<script>
+function cargarTicketsFiltrados() {
+    var fecha = document.getElementById('fecha').value;
+    var tablaTickets = document.getElementById('tablaTickets').getElementsByTagName('tbody')[0];
+    var filas = tablaTickets.getElementsByTagName('tr');
 
+    // Si la fecha seleccionada es vacía, mostrar todas las filas nuevamente
+    if (fecha === '') {
+        for (var i = 0; i < filas.length; i++) {
+            filas[i].style.display = '';
+        }
+        return; // Salir de la función ya que no hay que filtrar por fecha
+    }
+
+    // Iterar sobre todas las filas de la tabla
+    for (var i = 0; i < filas.length; i++) {
+        var celdas = filas[i].getElementsByTagName('td');
+        var fechaTicket = celdas[3].innerText; // La fecha está en la cuarta columna (índice 3) de cada fila
+
+        // Si la fecha del ticket coincide con la fecha seleccionada, mostrar la fila; de lo contrario, ocultarla
+        if (fechaTicket === fecha) {
+            filas[i].style.display = '';
+        } else {
+            filas[i].style.display = 'none';
+        }
+    }
+}
+</script>
+
+<script>
+  function mostrarModalComentarios(ticketId) {
+    // Muestra el modal de comentarios
+    $('#comentariosModal').modal('show');
+    // Aquí puedes realizar acciones adicionales si es necesario, como cargar los comentarios del ticket seleccionado, etc.
+  }
+</script>
+
+<script>
+  function mostrarModalComentarios(ticketId) {
+      // Muestra el modal de comentarios
+      $('#comentariosModal').modal('show');
+      // Aquí puedes realizar acciones adicionales si es necesario, como cargar los comentarios del ticket seleccionado, etc.
+  }
 
 </script>
+
 
 </body>
 </html>
